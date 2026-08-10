@@ -73,7 +73,6 @@ public class AuthService {
             this.encoder.encode(request.getPassword())
         );
         user.setBiography(request.getBiography());
-        user.setProfileImageUrl(request.getProfileImageUrl());
         user.setSkills(skills);
 
         this.userService.saveUser(user);

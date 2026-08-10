@@ -16,6 +16,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.http.HttpMethod;
 
 import es.tfg.bancodeltiempo.configuration.jwt.AuthEntryPointJwt;
 import es.tfg.bancodeltiempo.configuration.jwt.AuthTokenFilter;
@@ -64,6 +65,16 @@ public class SecurityConfiguration {
                     .requestMatchers(
                         "/api/auth/**"
                     ).permitAll()
+
+                    .requestMatchers(
+                        HttpMethod.GET,
+                        "/uploads/**"
+                    ).permitAll()
+
+                    .requestMatchers(
+                        HttpMethod.GET,
+                        "/api/skills")
+                    .permitAll()
 
                     .anyRequest().authenticated()
             )
