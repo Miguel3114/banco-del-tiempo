@@ -32,8 +32,5 @@ public class UserRegisterRequest {
     @Size(max = 1000)
     private String biography;
 
-    @Size(max = 255)
-    private String profileImageUrl;
-
     private Set<Integer> skillIds;
 }

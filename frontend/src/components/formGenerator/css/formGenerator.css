@@ -1,0 +1,132 @@
+.class-profile-form {
+    position: relative;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    align-items: center;
+}
+
+.class-form {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    padding-bottom: 25px;
+}
+
+.class-form > * {
+    width: 100%;
+    margin-top: 25px;
+}
+
+.class-form-group {
+    position: relative;
+    width: 100%;
+}
+
+input.class-form-input {
+    width: 100%;
+    font-family: inherit;
+    font-size: 1rem;
+    color: #303030;
+    padding: 0.6em 0.3em;
+    border: none;
+    outline: none;
+    border-bottom:
+        1px solid var(--main-green-color);
+    background-color: transparent;
+}
+
+textarea.class-form-input {
+    width: 100%;
+    min-height: 100px;
+    font-family: inherit;
+    font-size: 1rem;
+    color: #303030;
+    padding: 0.6em 0.3em;
+    border:
+        1px solid var(--main-green-color);
+    outline: none;
+    background-color: transparent;
+    resize: vertical;
+}
+
+.class-form-label {
+    color: #5e5e5e;
+    cursor: text;
+    position: absolute;
+    top: 0;
+    left: 5px;
+    transform: translateY(10px);
+    transition:
+        transform 0.5s,
+        color 0.3s;
+}
+
+.class-form-input:focus
+    + .class-form-label,
+.class-form-input:not(:placeholder-shown)
+    + .class-form-label {
+
+    transform:
+        translateY(-15px)
+        scale(0.7);
+
+    transform-origin: top left;
+
+    color: var(--main-green-color);
+}
+
+input.class-form-input[required]
+    + label.class-form-label:after,
+textarea.class-form-input[required]
+    + label.class-form-label:after {
+
+    content: "*";
+    color: #cc0033;
+}
+
+.class-error-form {
+    animation:
+        shake 0.2s ease-in-out 0s 2;
+}
+
+.class-error-form
+    .class-form-label {
+
+    color: #cc0033;
+}
+
+.class-error-form
+    .class-form-input {
+
+    background-color: #fce4e4;
+    border-color: #cc0033;
+}
+
+.class-error-message {
+    display: flex;
+    width: 100%;
+    font-size: 0.7em;
+    color: #cc0033;
+    padding-left: 3px;
+}
+
+@keyframes shake {
+
+    0% {
+        margin-left: 0;
+    }
+
+    25% {
+        margin-left: 0.5rem;
+    }
+
+    75% {
+        margin-left: -0.5rem;
+    }
+
+    100% {
+        margin-left: 0;
+    }
+}

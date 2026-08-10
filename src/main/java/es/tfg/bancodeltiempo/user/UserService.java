@@ -5,15 +5,24 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.io.IOException;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 public class UserService {
 
     private UserRepository userRepository;
 
+    private ProfileImageService profileImageService;
+
     @Autowired
-    public UserService(UserRepository userRepository) {
+    public UserService(
+            UserRepository userRepository,
+            ProfileImageService profileImageService) {
+
         this.userRepository = userRepository;
+
+        this.profileImageService = profileImageService;
     }
 
     @Transactional
@@ -45,5 +54,25 @@ public class UserService {
                     "Usuario no encontrado"
                 )
             );
+    }
+
+    @Transactional
+    public User updateProfileImage(
+            MultipartFile file)
+            throws IOException {
+
+        User user = this.findCurrentUser();
+
+        String profileImageUrl = this.profileImageService
+                .saveProfileImage(
+                        file,
+                        user.getId());
+
+        user.setProfileImageUrl(
+                profileImageUrl);
+
+        this.userRepository.save(user);
+
+        return user;
     }
 }

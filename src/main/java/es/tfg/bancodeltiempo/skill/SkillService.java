@@ -36,4 +36,9 @@ public class SkillService {
         this.skillRepository.save(skill);
         return skill;
     }
+
+    @Transactional(readOnly = true)
+    public Iterable<Skill> findAllSkills() {
+        return this.skillRepository.findAll();
+    }
 }

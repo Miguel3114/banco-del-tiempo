@@ -1,0 +1,396 @@
+.register-page-container {
+    min-height: calc(100vh - 56px);
+    padding: 28px 16px 50px;
+
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+
+    background-color: #f6f8fc;
+}
+
+.register-card {
+    width: 100%;
+    max-width: 720px;
+
+    padding: 26px 30px 24px;
+
+    background-color: #ffffff;
+
+    border: 1px solid #e5e9f0;
+    border-radius: 10px;
+
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.05);
+}
+
+.register-header {
+    text-align: center;
+    margin-bottom: 18px;
+}
+
+.register-header h1 {
+    margin: 0 0 8px;
+
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 29px;
+    font-weight: 500;
+
+    color: #3478df;
+}
+
+.register-header p {
+    margin: 0;
+
+    font-size: 13px;
+    line-height: 1.45;
+
+    color: #6e7788;
+}
+
+
+.profile-image-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    margin: 20px 0 24px;
+}
+
+.profile-image-circle {
+    width: 62px;
+    height: 62px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    margin-bottom: 10px;
+
+    border-radius: 50%;
+
+    background-color: #edf4ff;
+
+    overflow: hidden;
+}
+
+.profile-image-preview {
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover;
+}
+
+.profile-image-icon {
+    font-size: 23px;
+}
+
+.profile-image-input {
+    display: none;
+}
+
+.profile-image-button {
+    padding: 7px 13px;
+
+    border: 1px solid #3478df;
+    border-radius: 6px;
+
+    background-color: #f3f7ff;
+
+    color: #3478df;
+
+    font-size: 11px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+        background-color 0.2s,
+        border-color 0.2s;
+}
+
+.profile-image-button:hover {
+    background-color: #e7f0ff;
+    border-color: #2768c9;
+}
+
+.profile-image-info {
+    margin-top: 7px;
+
+    font-size: 10px;
+
+    color: #8a94a6;
+}
+
+
+.register-form-wrapper {
+    width: 100%;
+}
+
+.register-card .class-profile-form {
+    width: 100%;
+    height: auto;
+
+    display: block;
+
+    background-color: transparent;
+}
+
+.register-card .class-form {
+    width: 100%;
+    height: auto;
+
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px 16px;
+
+    padding: 0;
+    margin: 0;
+}
+
+.register-card .class-form > * {
+    width: 100% !important;
+    margin: 0 !important;
+}
+
+
+.register-card #firstName_form {
+    grid-column: 1;
+}
+
+.register-card #lastName_form {
+    grid-column: 2;
+}
+
+
+.register-card #email_form,
+.register-card #password_form,
+.register-card #biography_form,
+.register-card .skills-container {
+    grid-column: 1 / -1;
+}
+
+
+.register-card .class-form-group {
+    position: relative;
+
+    display: flex;
+    flex-direction: column;
+
+    width: 100% !important;
+
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+
+.register-card .class-form-label {
+    position: static;
+
+    order: -1;
+
+    display: block;
+
+    margin: 0 0 6px;
+
+    transform: none !important;
+
+    color: #252a34 !important;
+
+    font-size: 12px;
+    font-weight: 600;
+
+    cursor: default;
+}
+
+
+.register-card input.class-form-input,
+.register-card select.class-form-input {
+    width: 100%;
+
+    padding: 10px 12px;
+
+    border: 1px solid #d9dee8;
+    border-radius: 7px;
+
+    outline: none;
+
+    background-color: #ffffff;
+
+    color: #303643;
+
+    font-family: inherit;
+    font-size: 12px;
+
+    box-sizing: border-box;
+
+    transition:
+        border-color 0.2s,
+        box-shadow 0.2s;
+}
+
+
+.register-card textarea.class-form-input {
+    width: 100%;
+    min-height: 88px;
+
+    padding: 10px 12px;
+
+    border: 1px solid #d9dee8;
+    border-radius: 7px;
+
+    outline: none;
+
+    background-color: #ffffff;
+
+    color: #303643;
+
+    font-family: inherit;
+    font-size: 12px;
+
+    resize: vertical;
+
+    box-sizing: border-box;
+
+    transition:
+        border-color 0.2s,
+        box-shadow 0.2s;
+}
+
+
+.register-card input.class-form-input:focus,
+.register-card select.class-form-input:focus,
+.register-card textarea.class-form-input:focus {
+    border-color: #70a5f5;
+
+    box-shadow: 0 0 0 3px rgba(70, 133, 230, 0.1);
+}
+
+
+.register-card .class-form-input:focus + .class-form-label,
+.register-card .class-form-input:not(:placeholder-shown) + .class-form-label {
+    transform: none !important;
+
+    color: #252a34 !important;
+}
+
+
+.register-card
+input.class-form-input[required]
++ label.class-form-label:after,
+.register-card
+select.class-form-input[required]
++ label.class-form-label:after,
+.register-card
+textarea.class-form-input[required]
++ label.class-form-label:after {
+    content: "*";
+
+    margin-left: 2px;
+
+    color: #dc3545 !important;
+}
+
+
+.register-card .class-error-message {
+    margin-top: 4px;
+
+    font-size: 10px;
+
+    color: #cc0033;
+}
+
+.register-card .class-error-form input.class-form-input,
+.register-card .class-error-form textarea.class-form-input {
+    border-color: #cc0033;
+
+    background-color: #fff7f8;
+}
+
+
+.register-submit-button,
+.register-card .class-form-submit-button {
+    width: 100% !important;
+
+    margin-top: 20px !important;
+    padding: 11px 16px !important;
+
+    border: 1px solid #3478df !important;
+    border-radius: 7px !important;
+
+    background-color: #3478df !important;
+
+    color: #ffffff !important;
+
+    font-size: 12px !important;
+    font-weight: 600 !important;
+
+    cursor: pointer;
+
+    transition:
+        background-color 0.2s,
+        border-color 0.2s,
+        box-shadow 0.2s,
+        transform 0.1s;
+}
+
+.register-submit-button:hover,
+.register-card .class-form-submit-button:hover {
+    background-color: #2768c9 !important;
+    border-color: #2768c9 !important;
+
+    box-shadow:
+        0 3px 9px rgba(52, 120, 223, 0.22);
+}
+
+.register-submit-button:active,
+.register-card .class-form-submit-button:active {
+    transform: translateY(1px);
+}
+
+
+.register-login-link {
+    margin: 13px 0 0;
+
+    text-align: center;
+
+    color: #7b8494;
+
+    font-size: 11px;
+}
+
+.register-login-link a {
+    color: #3478df;
+
+    font-weight: 600;
+
+    text-decoration: none;
+}
+
+.register-login-link a:hover {
+    text-decoration: underline;
+}
+
+
+@media screen and (max-width: 650px) {
+
+    .register-page-container {
+        padding: 18px 10px 30px;
+    }
+
+    .register-card {
+        padding: 22px 18px;
+    }
+
+    .register-card .class-form {
+        grid-template-columns: 1fr;
+    }
+
+    .register-card #firstName_form,
+    .register-card #lastName_form,
+    .register-card #email_form,
+    .register-card #password_form,
+    .register-card #biography_form,
+    .register-card .skills-container {
+        grid-column: 1;
+    }
+}
