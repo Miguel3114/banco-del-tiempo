@@ -9,6 +9,9 @@ import org.springframework.transaction.annotation.Transactional;
 import es.tfg.bancodeltiempo.category.Category;
 import es.tfg.bancodeltiempo.category.CategoryService;
 import es.tfg.bancodeltiempo.category.CategoryStatus;
+import es.tfg.bancodeltiempo.exceptions.ConflictException;
+import es.tfg.bancodeltiempo.exceptions.ResourceNotFoundException;
+import es.tfg.bancodeltiempo.exceptions.ResourceNotOwnedException;
 import es.tfg.bancodeltiempo.user.User;
 import es.tfg.bancodeltiempo.user.UserService;
 
@@ -27,29 +30,40 @@ public class ListingService {
             UserService userService,
             CategoryService categoryService) {
 
-        this.listingRepository = listingRepository;
-        this.userService = userService;
-        this.categoryService = categoryService;
+        this.listingRepository =
+                listingRepository;
+
+        this.userService =
+                userService;
+
+        this.categoryService =
+                categoryService;
     }
 
     @Transactional(readOnly = true)
-    public Listing findListingById(Integer id) {
+    public Listing findListingById(
+            Integer id) {
 
         return this.listingRepository
                 .findById(id)
                 .orElseThrow(() ->
-                        new IllegalArgumentException(
-                                "Anuncio no encontrado"));
+                        new ResourceNotFoundException(
+                                "Anuncio",
+                                "id",
+                                id));
     }
 
     @Transactional(readOnly = true)
-    public Listing findActiveListingById(Integer id) {
+    public Listing findActiveListingById(
+            Integer id) {
 
-        Listing listing = this.findListingById(id);
+        Listing listing =
+                this.findListingById(id);
 
-        if (listing.getListingStatus() != ListingStatus.ACTIVE) {
+        if (listing.getListingStatus()
+                != ListingStatus.ACTIVE) {
 
-            throw new IllegalArgumentException(
+            throw new ConflictException(
                     "El anuncio no está activo");
         }
 
@@ -62,73 +76,102 @@ public class ListingService {
             Integer categoryId,
             String search) {
 
-        String searchText = search != null
-                ? search.trim()
-                : "";
+        String searchText =
+                search != null
+                        ? search.trim()
+                        : "";
 
-        boolean hasCategory = categoryId != null;
-        boolean hasSearch = !searchText.isBlank();
+        boolean hasCategory =
+                categoryId != null;
+
+        boolean hasSearch =
+                !searchText.isBlank();
 
         if (hasCategory && hasSearch) {
 
-            return this.listingRepository.searchByCategory(
-                    ListingStatus.ACTIVE,
-                    listingType,
-                    categoryId,
-                    searchText);
+            return this.listingRepository
+                    .searchByCategory(
+                            ListingStatus.ACTIVE,
+                            listingType,
+                            categoryId,
+                            searchText);
         }
 
         if (hasCategory) {
 
-            return this.listingRepository.findByCategory(
-                    ListingStatus.ACTIVE,
-                    listingType,
-                    categoryId);
+            return this.listingRepository
+                    .findByCategory(
+                            ListingStatus.ACTIVE,
+                            listingType,
+                            categoryId);
         }
 
         if (hasSearch) {
 
-            return this.listingRepository.searchByTitle(
-                    ListingStatus.ACTIVE,
-                    listingType,
-                    searchText);
+            return this.listingRepository
+                    .searchByTitle(
+                            ListingStatus.ACTIVE,
+                            listingType,
+                            searchText);
         }
 
-        return this.listingRepository.findByType(
-                ListingStatus.ACTIVE,
-                listingType);
+        return this.listingRepository
+                .findByType(
+                        ListingStatus.ACTIVE,
+                        listingType);
     }
 
     @Transactional(readOnly = true)
     public List<Listing> findMyListings() {
 
-        User currentUser = this.userService.findCurrentUser();
+        User currentUser =
+                this.userService
+                        .findCurrentUser();
 
-        return this.listingRepository.findByAuthor(
-                currentUser.getId(),
-                ListingStatus.ACTIVE);
+        return this.listingRepository
+                .findByAuthor(
+                        currentUser.getId(),
+                        ListingStatus.ACTIVE);
     }
 
     @Transactional
     public Listing createListing(
             ListingCreateRequest request) {
 
-        User currentUser = this.userService.findCurrentUser();
+        User currentUser =
+                this.userService
+                        .findCurrentUser();
 
-        Category category = this.findActiveCategory(
-                request.getCategoryId());
+        Category category =
+                this.findActiveCategory(
+                        request.getCategoryId());
 
-        Listing listing = new Listing();
+        Listing listing =
+                new Listing();
 
-        listing.setAuthor(currentUser);
-        listing.setCategory(category);
-        listing.setTitle(request.getTitle());
-        listing.setDescription(request.getDescription());
-        listing.setListingType(request.getListingType());
-        listing.setEstimatedHours(request.getEstimatedHours());
-        listing.setListingStatus(ListingStatus.ACTIVE);
+        listing.setAuthor(
+                currentUser);
 
-        return this.listingRepository.save(listing);
+        listing.setCategory(
+                category);
+
+        listing.setTitle(
+                request.getTitle());
+
+        listing.setDescription(
+                request.getDescription());
+
+        listing.setListingType(
+                request.getListingType());
+
+        listing.setEstimatedHours(
+                request.getEstimatedHours());
+
+        listing.setListingStatus(
+                ListingStatus.ACTIVE);
+
+        return this.listingRepository
+                .save(listing);
     }
 
     @Transactional
@@ -136,58 +179,84 @@ public class ListingService {
             Integer listingId,
             ListingUpdateRequest request) {
 
-        Listing listing = this.findListingById(listingId);
+        Listing listing =
+                this.findListingById(
+                        listingId);
 
-        User currentUser = this.userService.findCurrentUser();
+        User currentUser =
+                this.userService
+                        .findCurrentUser();
 
         this.checkListingOwnership(
                 listing,
                 currentUser);
 
-        this.checkListingIsActive(listing);
+        this.checkListingIsActive(
+                listing);
 
-        Category category = this.findActiveCategory(
-                request.getCategoryId());
+        Category category =
+                this.findActiveCategory(
+                        request.getCategoryId());
 
-        listing.setTitle(request.getTitle());
-        listing.setDescription(request.getDescription());
-        listing.setCategory(category);
-        listing.setEstimatedHours(request.getEstimatedHours());
+        listing.setTitle(
+                request.getTitle());
 
-        return this.listingRepository.save(listing);
+        listing.setDescription(
+                request.getDescription());
+
+        listing.setCategory(
+                category);
+
+        listing.setEstimatedHours(
+                request.getEstimatedHours());
+
+        return this.listingRepository
+                .save(listing);
     }
 
     @Transactional
-    public void deleteListing(Integer listingId) {
+    public void deleteListing(
+            Integer listingId) {
 
-        Listing listing = this.findListingById(listingId);
+        Listing listing =
+                this.findListingById(
+                        listingId);
 
-        User currentUser = this.userService.findCurrentUser();
+        User currentUser =
+                this.userService
+                        .findCurrentUser();
 
         this.checkListingOwnership(
                 listing,
                 currentUser);
 
-        this.checkListingIsActive(listing);
+        this.checkListingIsActive(
+                listing);
 
         listing.setListingStatus(
                 ListingStatus.INACTIVE);
 
-        this.listingRepository.save(listing);
+        this.listingRepository
+                .save(listing);
     }
 
     private Category findActiveCategory(
             Integer categoryId) {
 
-        Category category = this.categoryService
-                .findCategoryById(categoryId)
-                .orElseThrow(() ->
-                        new IllegalArgumentException(
-                                "Categoría no encontrada"));
+        Category category =
+                this.categoryService
+                        .findCategoryById(
+                                categoryId)
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "Categoría",
+                                        "id",
+                                        categoryId));
 
-        if (category.getStatus() != CategoryStatus.ACTIVE) {
+        if (category.getStatus()
+                != CategoryStatus.ACTIVE) {
 
-            throw new IllegalArgumentException(
+            throw new ConflictException(
                     "La categoría seleccionada no está activa");
         }
 
@@ -202,7 +271,7 @@ public class ListingService {
                 .getId()
                 .equals(currentUser.getId())) {
 
-            throw new IllegalArgumentException(
+            throw new ResourceNotOwnedException(
                     "No puedes modificar un anuncio que no te pertenece");
         }
     }
@@ -210,9 +279,10 @@ public class ListingService {
     private void checkListingIsActive(
             Listing listing) {
 
-        if (listing.getListingStatus() != ListingStatus.ACTIVE) {
+        if (listing.getListingStatus()
+                != ListingStatus.ACTIVE) {
 
-            throw new IllegalArgumentException(
+            throw new ConflictException(
                     "El anuncio no está activo");
         }
     }
