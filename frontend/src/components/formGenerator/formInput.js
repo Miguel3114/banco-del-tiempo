@@ -6,6 +6,7 @@ import {
     useState
 } from "react";
 
+
 const FormInput = forwardRef(({
     tag,
     name,
@@ -23,13 +24,17 @@ const FormInput = forwardRef(({
     maxLength
 }, ref) => {
 
-    const [inputErrors, setInputErrors] = useState([]);
+    const [inputErrors, setInputErrors] =
+        useState([]);
 
-    let inputField = useRef(null);
+    const inputField =
+        useRef(null);
+
 
     useImperativeHandle(ref, () => {
 
         return {
+
             setErrors: (errors) => {
                 setInputErrors(errors);
             },
@@ -40,62 +45,133 @@ const FormInput = forwardRef(({
         };
     });
 
+
     useEffect(() => {
 
-        const currentInput = inputField.current;
+        const currentInput =
+            inputField.current;
+
+        if (!currentInput) {
+            return;
+        }
+
 
         const validateInput = () => {
 
-            let errors = [];
+            const errors = [];
 
-            validators.forEach((validator) => {
+            validators.forEach(
+                (validator) => {
 
-                if (!validator.validate(currentInput.value)) {
-                    errors.push(validator.message);
+                    if (
+                        !validator.validate(
+                            currentInput.value
+                        )
+                    ) {
+
+                        errors.push(
+                            validator.message
+                        );
+                    }
                 }
-            });
+            );
 
             setInputErrors(errors);
+
+
+            if (onChange) {
+
+                onChange({
+                    value:
+                        currentInput.value
+                });
+            }
         };
+
 
         currentInput.addEventListener(
             "change",
             validateInput
         );
 
+
         return () => {
+
             currentInput.removeEventListener(
                 "change",
                 validateInput
             );
         };
 
-    }, [validators]);
+    }, [
+        validators,
+        onChange
+    ]);
 
-    if (type === "textarea") {
+
+    if (type === "select") {
 
         return (
+
             <div
+                id={`${name}_form`}
                 className={
-                    `class-form-group ${inputErrors.length > 0
-                        ? "class-error-form"
-                        : ""
+                    `class-form-group ${
+                        inputErrors.length > 0
+                            ? "class-error-form"
+                            : ""
                     }`
                 }
             >
-                <textarea
+
+                <select
                     className="class-form-input"
                     disabled={disabled}
                     id={name}
                     name={name}
-                    placeholder={placeholder || " "}
-                    defaultValue={
-                        `${defaultValue ? defaultValue : ""}`
-                    }
                     required={isRequired}
-                    maxLength={maxLength}
+                    defaultValue={
+                        defaultValue ?? ""
+                    }
                     ref={inputField}
-                />
+                >
+
+                    {values.map(
+                        (option, index) => {
+
+                            const optionValue =
+                                typeof option === "object"
+                                    ? option.value
+                                    : option;
+
+                            const optionLabel =
+                                typeof option === "object"
+                                    ? option.label
+                                    : option;
+
+
+                            return (
+
+                                <option
+                                    key={
+                                        `${name}-${optionValue}-${index}`
+                                    }
+                                    value={
+                                        optionValue
+                                    }
+                                >
+
+                                    {
+                                        optionLabel
+                                    }
+
+                                </option>
+                            );
+                        }
+                    )}
+
+                </select>
+
 
                 <label
                     htmlFor={name}
@@ -104,41 +180,121 @@ const FormInput = forwardRef(({
                     {tag}:
                 </label>
 
-                {inputErrors.map((error, index) => (
-                    <span
-                        key={index}
-                        className="class-error-message"
-                    >
-                        {error}
-                    </span>
-                ))}
+
+                {inputErrors.map(
+                    (error, index) => (
+
+                        <span
+                            key={index}
+                            className="class-error-message"
+                        >
+                            {error}
+                        </span>
+                    )
+                )}
+
             </div>
         );
     }
 
+
+    if (type === "textarea") {
+
+        return (
+
+            <div
+                id={`${name}_form`}
+                className={
+                    `class-form-group ${
+                        inputErrors.length > 0
+                            ? "class-error-form"
+                            : ""
+                    }`
+                }
+            >
+
+                <textarea
+                    className="class-form-input"
+                    disabled={disabled}
+                    id={name}
+                    name={name}
+                    placeholder={
+                        placeholder || " "
+                    }
+                    defaultValue={
+                        `${
+                            defaultValue
+                                ? defaultValue
+                                : ""
+                        }`
+                    }
+                    required={isRequired}
+                    maxLength={maxLength}
+                    ref={inputField}
+                />
+
+
+                <label
+                    htmlFor={name}
+                    className="class-form-label"
+                >
+                    {tag}:
+                </label>
+
+
+                {inputErrors.map(
+                    (error, index) => (
+
+                        <span
+                            key={index}
+                            className="class-error-message"
+                        >
+                            {error}
+                        </span>
+                    )
+                )}
+
+            </div>
+        );
+    }
+
+
     return (
+
         <div
+            id={`${name}_form`}
             className={
-                `class-form-group ${inputErrors.length > 0
-                    ? "class-error-form"
-                    : ""
+                `class-form-group ${
+                    inputErrors.length > 0
+                        ? "class-error-form"
+                        : ""
                 }`
             }
         >
+
             <input
                 className="class-form-input"
                 disabled={disabled}
                 type={type}
                 id={name}
                 name={name}
-                placeholder={placeholder || " "}
+                placeholder={
+                    placeholder || " "
+                }
                 defaultValue={
-                    `${defaultValue ? defaultValue : ""}`
+                    `${
+                        defaultValue
+                            ? defaultValue
+                            : ""
+                    }`
                 }
                 required={isRequired}
+                min={minValue}
+                max={maxValue}
                 maxLength={maxLength}
                 ref={inputField}
             />
+
 
             <label
                 htmlFor={name}
@@ -147,25 +303,44 @@ const FormInput = forwardRef(({
                 {tag}:
             </label>
 
-            {inputErrors.map((error, index) => (
-                <span
-                    key={index}
-                    className="class-error-message"
-                >
-                    {error}
-                </span>
-            ))}
+
+            {inputErrors.map(
+                (error, index) => (
+
+                    <span
+                        key={index}
+                        className="class-error-message"
+                    >
+                        {error}
+                    </span>
+                )
+            )}
+
         </div>
     );
 });
 
+
 FormInput.defaultProps = {
+
     tag: "default",
+
     name: "default",
+
     type: "text",
+
     defaultValue: "",
+
+    values: [],
+
     isRequired: false,
-    validators: []
+
+    validators: [],
+
+    disabled: false,
+
+    onChange: null
 };
+
 
 export default FormInput;

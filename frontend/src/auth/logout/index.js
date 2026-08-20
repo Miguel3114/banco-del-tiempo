@@ -1,25 +1,30 @@
 import React from "react";
 
-import { Link } from "react-router-dom";
-
-import "../../static/css/auth/authButton.css";
-import "../../static/css/auth/authPage.css";
+import {
+    Link
+} from "react-router-dom";
 
 import tokenService
     from "../../services/token.service";
 
+import "../../static/css/auth/authPage.css";
+
+
 const Logout = () => {
+
 
     function sendLogoutRequest() {
 
         const jwt =
-            tokenService.getLocalAccessToken();
+            tokenService
+                .getLocalAccessToken();
 
         if (jwt) {
 
             tokenService.removeUser();
 
-            window.location.href = "/login";
+            window.location.href =
+                "/login";
 
         } else {
 
@@ -29,32 +34,48 @@ const Logout = () => {
         }
     }
 
+
     return (
+
         <div className="auth-page-container">
 
-            <div className="auth-form-container">
+            <div className="auth-card logout-card">
 
-                <h2 className="text-center">
-                    ¿Seguro que quieres cerrar sesión?
-                </h2>
+                <div className="auth-header">
 
-                <div className="options-row">
+                    <h1>
+                        Cerrar sesión
+                    </h1>
+
+                    <p>
+                        ¿Seguro que quieres cerrar sesión?
+                        <br />
+                        Tendrás que volver a identificarte
+                        para acceder a tu cuenta.
+                    </p>
+
+                </div>
+
+
+                <div className="logout-options">
 
                     <Link
-                        className="auth-button"
                         to="/listings"
-                        style={{
-                            textDecoration: "none"
-                        }}
+                        className={
+                            "logout-button logout-cancel-button"
+                        }
                     >
                         No
                     </Link>
 
+
                     <button
-                        className="auth-button"
+                        type="button"
+                        className={
+                            "logout-button logout-confirm-button"
+                        }
                         onClick={
-                            () =>
-                                sendLogoutRequest()
+                            sendLogoutRequest
                         }
                     >
                         Sí
@@ -67,5 +88,6 @@ const Logout = () => {
         </div>
     );
 };
+
 
 export default Logout;

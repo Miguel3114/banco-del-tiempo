@@ -1,0 +1,489 @@
+.listing-form-page {
+    min-height: calc(100vh - 55px);
+
+    padding: 30px 16px 50px;
+
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+
+    background-color: #f6f8fc;
+}
+
+
+.listing-form-card {
+    width: 100%;
+    max-width: 720px;
+
+    padding: 28px 30px 25px;
+
+    background-color: #ffffff;
+
+    border: 1px solid #e5e9f0;
+    border-radius: 10px;
+
+    box-shadow:
+        0 4px 18px rgba(
+            0,
+            0,
+            0,
+            0.05
+        );
+}
+
+
+/* CABECERA */
+
+.listing-form-header {
+    margin-bottom: 25px;
+
+    text-align: center;
+}
+
+
+.listing-form-header h1 {
+    margin: 0 0 8px;
+
+    font-family:
+        Georgia,
+        "Times New Roman",
+        serif;
+
+    font-size: 29px;
+    font-weight: 500;
+
+    color: #3478df;
+}
+
+
+.listing-form-header p {
+    max-width: 520px;
+
+    margin:
+        0 auto;
+
+    color: #6e7788;
+
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+
+/* FORM GENERATOR */
+
+.listing-form-card
+.class-profile-form {
+
+    width: 100%;
+    height: auto;
+
+    display: block;
+
+    background-color:
+        transparent;
+}
+
+
+.listing-form-card
+.class-form {
+
+    width: 100%;
+    height: auto;
+
+    display: grid;
+
+    grid-template-columns:
+        1fr 1fr;
+
+    gap: 16px;
+
+    padding: 0;
+    margin: 0;
+}
+
+
+.listing-form-card
+.class-form > * {
+
+    width: 100% !important;
+
+    margin: 0 !important;
+}
+
+
+/* TÍTULO */
+
+.listing-form-card
+.class-form > :nth-child(1) {
+
+    grid-column: 1 / -1;
+}
+
+
+/* CATEGORÍA */
+
+.listing-form-card
+.class-form > :nth-child(2) {
+
+    grid-column: 1;
+}
+
+
+/* HORAS */
+
+.listing-form-card
+.class-form > :nth-child(3) {
+
+    grid-column: 2;
+}
+
+
+/* DESCRIPCIÓN */
+
+.listing-form-card
+.class-form > :nth-child(4) {
+
+    grid-column: 1 / -1;
+}
+
+
+/* GRUPOS */
+
+.listing-form-card
+.class-form-group {
+
+    position: relative;
+
+    display: flex;
+    flex-direction: column;
+
+    width: 100% !important;
+
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+
+/* LABELS */
+
+.listing-form-card
+.class-form-label {
+
+    position: static;
+
+    order: -1;
+
+    display: block;
+
+    margin: 0 0 6px;
+
+    transform: none !important;
+
+    color: #252a34 !important;
+
+    font-size: 12px;
+    font-weight: 600;
+
+    cursor: default;
+}
+
+
+/* INPUTS Y SELECT */
+
+.listing-form-card
+input.class-form-input,
+
+.listing-form-card
+select.class-form-input {
+
+    width: 100%;
+
+    padding: 10px 12px;
+
+    border:
+        1px solid #d9dee8;
+
+    border-radius: 7px;
+
+    outline: none;
+
+    background-color:
+        #ffffff;
+
+    color: #303643;
+
+    font-family: inherit;
+    font-size: 12px;
+
+    box-sizing:
+        border-box;
+
+    transition:
+        border-color 0.2s,
+        box-shadow 0.2s;
+}
+
+
+/* TEXTAREA */
+
+.listing-form-card
+textarea.class-form-input {
+
+    width: 100%;
+    min-height: 130px;
+
+    padding: 10px 12px;
+
+    border:
+        1px solid #d9dee8;
+
+    border-radius: 7px;
+
+    outline: none;
+
+    background-color:
+        #ffffff;
+
+    color: #303643;
+
+    font-family: inherit;
+    font-size: 12px;
+
+    line-height: 1.5;
+
+    resize: vertical;
+
+    box-sizing:
+        border-box;
+
+    transition:
+        border-color 0.2s,
+        box-shadow 0.2s;
+}
+
+
+.listing-form-card
+input.class-form-input:focus,
+
+.listing-form-card
+select.class-form-input:focus,
+
+.listing-form-card
+textarea.class-form-input:focus {
+
+    border-color:
+        #70a5f5;
+
+    box-shadow:
+        0 0 0 3px
+        rgba(
+            70,
+            133,
+            230,
+            0.1
+        );
+}
+
+
+/* EVITAMOS LABEL FLOTANTE */
+
+.listing-form-card
+.class-form-input:focus
++ .class-form-label,
+
+.listing-form-card
+.class-form-input:not(
+    :placeholder-shown
+)
++ .class-form-label {
+
+    transform:
+        none !important;
+
+    color:
+        #252a34 !important;
+}
+
+
+/* ASTERISCO OBLIGATORIO */
+
+.listing-form-card
+input.class-form-input[required]
++ label.class-form-label:after,
+
+.listing-form-card
+select.class-form-input[required]
++ label.class-form-label:after,
+
+.listing-form-card
+textarea.class-form-input[required]
++ label.class-form-label:after {
+
+    content: "*";
+
+    margin-left: 2px;
+
+    color:
+        #dc3545 !important;
+}
+
+
+/* ERRORES */
+
+.listing-form-card
+.class-error-message {
+
+    margin-top: 4px;
+
+    font-size: 10px;
+
+    color: #cc0033;
+}
+
+
+.listing-form-card
+.class-error-form
+input.class-form-input,
+
+.listing-form-card
+.class-error-form
+select.class-form-input,
+
+.listing-form-card
+.class-error-form
+textarea.class-form-input {
+
+    border-color:
+        #cc0033;
+
+    background-color:
+        #fff7f8;
+}
+
+
+/* BOTÓN */
+
+.listing-submit-button {
+    width: 100% !important;
+
+    margin-top: 22px !important;
+
+    padding:
+        11px 16px !important;
+
+    border:
+        1px solid
+        #3478df !important;
+
+    border-radius:
+        7px !important;
+
+    background-color:
+        #3478df !important;
+
+    color:
+        #ffffff !important;
+
+    font-size:
+        12px !important;
+
+    font-weight:
+        600 !important;
+
+    cursor: pointer;
+
+    transition:
+        background-color 0.2s,
+        border-color 0.2s,
+        box-shadow 0.2s,
+        transform 0.1s;
+}
+
+
+.listing-submit-button:hover {
+    background-color:
+        #2768c9 !important;
+
+    border-color:
+        #2768c9 !important;
+
+    box-shadow:
+        0 3px 9px
+        rgba(
+            52,
+            120,
+            223,
+            0.22
+        );
+}
+
+
+.listing-submit-button:active {
+    transform:
+        translateY(1px);
+}
+
+
+/* CANCELAR */
+
+.listing-form-cancel {
+    display: block;
+
+    margin-top: 13px;
+
+    text-align: center;
+
+    color: #7b8494;
+
+    font-size: 11px;
+
+    text-decoration: none;
+}
+
+
+.listing-form-cancel:hover {
+    color: #3478df;
+
+    text-decoration:
+        underline;
+}
+
+
+/* RESPONSIVE */
+
+@media (
+    max-width: 576px
+) {
+
+    .listing-form-page {
+        padding:
+            20px 12px 40px;
+    }
+
+
+    .listing-form-card {
+        padding:
+            24px 20px;
+    }
+
+
+    .listing-form-card
+    .class-form {
+
+        grid-template-columns:
+            1fr;
+    }
+
+
+    .listing-form-card
+    .class-form > * {
+
+        grid-column:
+            1 !important;
+    }
+
+
+    .listing-form-header h1 {
+        font-size: 26px;
+    }
+}

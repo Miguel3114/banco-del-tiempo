@@ -1,67 +1,106 @@
-import jwt_decode from "jwt-decode";
+import jwt_decode
+    from "jwt-decode";
 
 import {
     Route,
     Routes
 } from "react-router-dom";
 
-import AppNavbar from "./AppNavbar";
+import AppNavbar
+    from "./AppNavbar";
 
-import Login from "./auth/login";
-import Logout from "./auth/logout";
-import Register from "./auth/register";
+import Login
+    from "./auth/login";
 
-import Listings from "./listing";
+import Logout
+    from "./auth/logout";
 
-import PrivateRoute from "./privateRoute";
+import Register
+    from "./auth/register";
+
+import Listings
+    from "./listing";
+
+import ListingCreate
+    from "./listing/ListingCreate";
+
+import PrivateRoute
+    from "./privateRoute";
 
 import tokenService
     from "./services/token.service";
 
+
 function App() {
 
     const jwt =
-        tokenService.getLocalAccessToken();
+        tokenService
+            .getLocalAccessToken();
+
 
     let roles = [];
 
+
     if (jwt) {
-        roles = getRolesFromJWT(jwt);
+
+        roles =
+            getRolesFromJWT(jwt);
     }
 
-    function getRolesFromJWT(jwt) {
 
-        return jwt_decode(jwt).authorities;
+    function getRolesFromJWT(
+        token
+    ) {
+
+        return jwt_decode(
+            token
+        ).authorities;
     }
+
 
     let publicRoutes = <></>;
+
     let userRoutes = <></>;
+
     let adminRoutes = <></>;
 
-    roles.forEach((role) => {
 
-        if (role === "ADMIN") {
+    roles.forEach(
+        (role) => {
 
-            adminRoutes = (
-                <>
-                </>
-            );
+            if (
+                role === "ADMIN"
+            ) {
+
+                adminRoutes = (
+                    <>
+                    </>
+                );
+            }
         }
-    });
+    );
+
 
     if (!jwt) {
 
         publicRoutes = (
             <>
+
                 <Route
                     path="/register"
-                    element={<Register />}
+                    element={
+                        <Register />
+                    }
                 />
+
 
                 <Route
                     path="/login"
-                    element={<Login />}
+                    element={
+                        <Login />
+                    }
                 />
+
             </>
         );
 
@@ -69,23 +108,85 @@ function App() {
 
         userRoutes = (
             <>
-                <Route
-                    path="/logout"
-                    element={<Logout />}
-                />
 
                 <Route
-                    path="/login"
-                    element={<Login />}
+                    path="/logout"
+                    element={
+                        <Logout />
+                    }
                 />
+
+
+                <Route
+                    path="/listings"
+                    element={
+
+                        <PrivateRoute>
+
+                            <Listings
+                                listingType="OFFER"
+                            />
+
+                        </PrivateRoute>
+                    }
+                />
+
+
+                <Route
+                    path="/requests"
+                    element={
+
+                        <PrivateRoute>
+
+                            <Listings
+                                listingType="REQUEST"
+                            />
+
+                        </PrivateRoute>
+                    }
+                />
+
+
+                <Route
+                    path="/listings/new"
+                    element={
+
+                        <PrivateRoute>
+
+                            <ListingCreate
+                                listingType="OFFER"
+                            />
+
+                        </PrivateRoute>
+                    }
+                />
+
+
+                <Route
+                    path="/requests/new"
+                    element={
+
+                        <PrivateRoute>
+
+                            <ListingCreate
+                                listingType="REQUEST"
+                            />
+
+                        </PrivateRoute>
+                    }
+                />
+
             </>
         );
     }
 
+
     return (
+
         <div>
 
             <AppNavbar />
+
 
             <Routes>
 
@@ -94,22 +195,23 @@ function App() {
                     element={
                         jwt
                             ? (
+
                                 <PrivateRoute>
-                                    <Listings />
+
+                                    <Listings
+                                        listingType="OFFER"
+                                    />
+
                                 </PrivateRoute>
+
                             )
-                            : <Login />
+                            : (
+
+                                <Login />
+                            )
                     }
                 />
 
-                <Route
-                    path="/listings"
-                    element={
-                        <PrivateRoute>
-                            <Listings />
-                        </PrivateRoute>
-                    }
-                />
 
                 {publicRoutes}
 
@@ -122,5 +224,6 @@ function App() {
         </div>
     );
 }
+
 
 export default App;
