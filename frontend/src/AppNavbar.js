@@ -18,7 +18,8 @@ import {
     Link
 } from "react-router-dom";
 
-import jwt_decode from "jwt-decode";
+import jwt_decode
+    from "jwt-decode";
 
 import tokenService
     from "./services/token.service";
@@ -40,8 +41,10 @@ function AppNavbar() {
     const [collapsed, setCollapsed] =
         useState(true);
 
+
     const jwt =
         tokenService.getLocalAccessToken();
+
 
     const toggleNavbar =
         () => setCollapsed(!collapsed);
@@ -51,12 +54,15 @@ function AppNavbar() {
 
         if (jwt) {
 
+            const decodedToken =
+                jwt_decode(jwt);
+
             setRoles(
-                jwt_decode(jwt).authorities
+                decodedToken.authorities
             );
 
             setEmail(
-                jwt_decode(jwt).sub
+                decodedToken.sub
             );
         }
 
@@ -124,8 +130,22 @@ function AppNavbar() {
                     <NavLink
                         tag={Link}
                         to="/listings"
+                        className="main-navbar-link"
                     >
                         Ofertas
+                    </NavLink>
+
+                </NavItem>
+
+
+                <NavItem>
+
+                    <NavLink
+                        tag={Link}
+                        to="/requests"
+                        className="main-navbar-link"
+                    >
+                        Demandas
                     </NavLink>
 
                 </NavItem>
@@ -138,7 +158,7 @@ function AppNavbar() {
             <>
 
                 <NavbarText
-                    className="me-3"
+                    className="navbar-user-email"
                 >
                     {email}
                 </NavbarText>
@@ -149,6 +169,7 @@ function AppNavbar() {
                     <NavLink
                         tag={Link}
                         to="/logout"
+                        className="navbar-logout-link"
                     >
                         Cerrar sesión
                     </NavLink>
@@ -194,21 +215,25 @@ function AppNavbar() {
             <Collapse
                 isOpen={!collapsed}
                 navbar
+                className="app-navbar-collapse"
             >
 
+                {jwt ? (
+
+                    <Nav
+                        className="navbar-center-links"
+                        navbar
+                    >
+
+                        {userLinks}
+
+                    </Nav>
+
+                ) : null}
+
+
                 <Nav
-                    className="me-auto"
-                    navbar
-                >
-
-                    {userLinks}
-                    {adminLinks}
-
-                </Nav>
-
-
-                <Nav
-                    className="ms-auto"
+                    className="navbar-right-links"
                     navbar
                 >
 
@@ -216,6 +241,9 @@ function AppNavbar() {
                     {userLogout}
 
                 </Nav>
+
+
+                {adminLinks}
 
             </Collapse>
 
