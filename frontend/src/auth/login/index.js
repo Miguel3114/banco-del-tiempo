@@ -3,7 +3,13 @@ import React, {
     useState
 } from "react";
 
-import { Alert } from "reactstrap";
+import {
+    Alert
+} from "reactstrap";
+
+import {
+    Link
+} from "react-router-dom";
 
 import FormGenerator
     from "../../components/formGenerator/formGenerator";
@@ -11,68 +17,93 @@ import FormGenerator
 import tokenService
     from "../../services/token.service";
 
-import "../../static/css/auth/authButton.css";
 import "../../static/css/auth/authPage.css";
 
 import {
     loginFormInputs
 } from "./form/loginFormInputs";
 
+
 export default function Login() {
 
     const [message, setMessage] =
         useState(null);
 
-    const loginFormRef = useRef();
+    const loginFormRef =
+        useRef();
 
-    async function handleSubmit({ values }) {
 
-        if (!loginFormRef.current.validate()) {
+    async function handleSubmit({
+        values
+    }) {
+
+        if (
+            !loginFormRef.current
+                .validate()
+        ) {
             return;
         }
 
         setMessage(null);
 
-        const request = values;
+        const request =
+            values;
 
-        fetch("/api/auth/login", {
 
-            headers: {
-                "Content-Type": "application/json"
-            },
+        fetch(
+            "/api/auth/login",
+            {
+                headers: {
+                    "Content-Type":
+                        "application/json"
+                },
 
-            method: "POST",
+                method: "POST",
 
-            body: JSON.stringify(request)
+                body:
+                    JSON.stringify(
+                        request
+                    )
+            }
+        )
 
-        })
-            .then((res) =>
-                res.json().then((data) => ({
-                    status: res.status,
-                    data
-                }))
-            )
+            .then((response) => {
 
-            .then(({ status, data }) => {
+                return response
+                    .json()
+                    .then((data) => ({
+                        status:
+                            response.status,
+                        data: data
+                    }));
+            })
 
-                if (status !== 200) {
+            .then(
+                ({ status, data }) => {
 
-                    setMessage(
-                        data.message ||
-                        "Error al iniciar sesión"
+                    if (status !== 200) {
+
+                        setMessage(
+                            data.message ||
+                            "Error al iniciar sesión"
+                        );
+
+                        return;
+                    }
+
+                    tokenService.setUser(
+                        data
                     );
 
-                    return;
+                    tokenService
+                        .updateLocalAccessToken(
+                            data.token
+                        );
+
+                    window.location.href =
+                        "/listings";
                 }
-
-                tokenService.setUser(data);
-
-                tokenService.updateLocalAccessToken(
-                    data.token
-                );
-
-                window.location.href = "/listings";
-            })
+            )
 
             .catch(() => {
 
@@ -82,28 +113,65 @@ export default function Login() {
             });
     }
 
+
     return (
+
         <div className="auth-page-container">
 
-            {message ? (
-                <Alert color="danger">
-                    {message}
-                </Alert>
-            ) : (
-                <></>
-            )}
+            <div className="auth-card">
 
-            <h1>Iniciar sesión</h1>
+                {message ? (
 
-            <div className="auth-form-container">
+                    <Alert color="danger">
+                        {message}
+                    </Alert>
+
+                ) : null}
+
+
+                <div className="auth-header">
+
+                    <h1>
+                        Iniciar sesión
+                    </h1>
+
+                    <p>
+                        Accede a tu cuenta para
+                        seguir compartiendo tu tiempo
+                        <br />
+                        con la comunidad.
+                    </p>
+
+                </div>
+
 
                 <FormGenerator
-                    ref={loginFormRef}
-                    inputs={loginFormInputs}
-                    onSubmit={handleSubmit}
+                    ref={
+                        loginFormRef
+                    }
+                    inputs={
+                        loginFormInputs
+                    }
+                    onSubmit={
+                        handleSubmit
+                    }
+                    numberOfColumns={1}
                     buttonText="Entrar"
-                    buttonClassName="auth-button"
+                    buttonClassName={
+                        "auth-submit-button"
+                    }
                 />
+
+
+                <p className="auth-register-link">
+
+                    ¿Todavía no tienes cuenta?{" "}
+
+                    <Link to="/register">
+                        Regístrate
+                    </Link>
+
+                </p>
 
             </div>
 
