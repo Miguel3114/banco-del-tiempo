@@ -24,6 +24,12 @@ import Listings
 import ListingCreate
     from "./listing/ListingCreate";
 
+import ListingDetails
+    from "./listing/ListingDetails";
+
+import MyListings
+    from "./listing/MyListings";
+
 import PrivateRoute
     from "./privateRoute";
 
@@ -171,6 +177,43 @@ function App() {
                             <ListingCreate
                                 listingType="REQUEST"
                             />
+
+                        </PrivateRoute>
+                    }
+                />
+
+
+                <Route
+                    path="/listings/:id"
+                    element={
+
+                        <PrivateRoute>
+
+                            <ListingDetails />
+
+                        </PrivateRoute>
+                    }
+                />
+
+                <Route
+                    path="/requests/:id"
+                    element={
+
+                        <PrivateRoute>
+
+                            <ListingDetails />
+
+                        </PrivateRoute>
+                    }
+                />
+
+                <Route
+                    path="/mylistings"
+                    element={
+
+                        <PrivateRoute>
+
+                            <MyListings />
 
                         </PrivateRoute>
                     }

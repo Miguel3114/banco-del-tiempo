@@ -62,7 +62,6 @@
 }
 
 
-/* FORMULARIO */
 
 .auth-card .class-profile-form {
     width: 100%;
@@ -185,8 +184,6 @@ input.class-form-input[required]
 }
 
 
-/* ERRORES */
-
 .auth-card .class-error-message {
     margin-top: 4px;
 
@@ -205,8 +202,6 @@ input.class-form-input {
     background-color: #fff7f8;
 }
 
-
-/* BOTÓN LOGIN */
 
 .auth-submit-button {
     width: 100% !important;
@@ -249,8 +244,6 @@ input.class-form-input {
 }
 
 
-/* ENLACE INFERIOR DEL LOGIN */
-
 .auth-register-link {
     margin: 14px 0 0;
 
@@ -275,8 +268,6 @@ input.class-form-input {
     text-decoration: underline;
 }
 
-
-/* LOGOUT */
 
 .logout-card {
     max-width: 560px;
@@ -367,8 +358,6 @@ input.class-form-input {
     transform: translateY(1px);
 }
 
-
-/* RESPONSIVE */
 
 @media (max-width: 576px) {
 

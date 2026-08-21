@@ -8,7 +8,8 @@ import {
 } from "reactstrap";
 
 import {
-    Link
+    Link,
+    useNavigate
 } from "react-router-dom";
 
 import tokenService
@@ -40,6 +41,10 @@ export default function Listings({
 
     const [loading, setLoading] =
         useState(true);
+
+
+    const navigate =
+        useNavigate();
 
 
     const jwt =
@@ -79,21 +84,22 @@ export default function Listings({
             }
         )
 
-            .then((response) => {
+            .then(async (response) => {
 
-                if (response.status === 200) {
-                    return response.json();
+                const data =
+                    await response.json();
+
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        data.message ||
+                        "No se han podido cargar las categorías"
+                    );
                 }
 
-                return response
-                    .json()
-                    .then((data) => {
 
-                        return Promise.reject(
-                            data.message ||
-                            "No se han podido cargar las categorías"
-                        );
-                    });
+                return data;
             })
 
             .then((data) => {
@@ -103,7 +109,9 @@ export default function Listings({
 
             .catch((error) => {
 
-                setMessage(error);
+                setMessage(
+                    error.message
+                );
             });
     }
 
@@ -111,7 +119,6 @@ export default function Listings({
     function loadListings() {
 
         setLoading(true);
-
         setMessage(null);
 
 
@@ -153,22 +160,22 @@ export default function Listings({
             }
         )
 
-            .then((response) => {
+            .then(async (response) => {
 
-                if (response.status === 200) {
-                    return response.json();
+                const data =
+                    await response.json();
+
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        data.message ||
+                        "No se han podido cargar los anuncios"
+                    );
                 }
 
 
-                return response
-                    .json()
-                    .then((data) => {
-
-                        return Promise.reject(
-                            data.message ||
-                            "No se han podido cargar los anuncios"
-                        );
-                    });
+                return data;
             })
 
             .then((data) => {
@@ -178,7 +185,9 @@ export default function Listings({
 
             .catch((error) => {
 
-                setMessage(error);
+                setMessage(
+                    error.message
+                );
             })
 
             .finally(() => {
@@ -199,8 +208,39 @@ export default function Listings({
     function handleClearFilters() {
 
         setSearch("");
-
         setSelectedCategory("");
+    }
+
+
+    function openListing(
+    listingId
+) {
+
+    const route =
+        isOffer
+            ? `/listings/${listingId}`
+            : `/requests/${listingId}`;
+
+    navigate(route);
+}
+
+
+    function handleCardKeyDown(
+        event,
+        listingId
+    ) {
+
+        if (
+            event.key === "Enter" ||
+            event.key === " "
+        ) {
+
+            event.preventDefault();
+
+            openListing(
+                listingId
+            );
+        }
     }
 
 
@@ -325,23 +365,25 @@ export default function Listings({
                                 </option>
 
 
-                                {categories.map(
-                                    (category) => (
+                                {
+                                    categories.map(
+                                        (category) => (
 
-                                        <option
-                                            key={
-                                                category.id
-                                            }
-                                            value={
-                                                category.id
-                                            }
-                                        >
-                                            {
-                                                category.name
-                                            }
-                                        </option>
+                                            <option
+                                                key={
+                                                    category.id
+                                                }
+                                                value={
+                                                    category.id
+                                                }
+                                            >
+                                                {
+                                                    category.name
+                                                }
+                                            </option>
+                                        )
                                     )
-                                )}
+                                }
 
                             </select>
 
@@ -371,152 +413,171 @@ export default function Listings({
 
                     <main className="listings-main">
 
-                        {loading ? (
 
-                            <div className="listings-message">
-                                Cargando anuncios...
-                            </div>
+                        {
+                            loading
+                                ? (
 
-                        ) : listings.length === 0 ? (
+                                    <div className="listings-message">
+                                        Cargando anuncios...
+                                    </div>
 
-                            <div className="listings-empty">
+                                )
+                                : listings.length === 0
+                                    ? (
 
-                                <h2>
-                                    No hay anuncios
-                                </h2>
+                                        <div className="listings-empty">
 
-
-                                <p>
-
-                                    {
-                                        isOffer
-                                            ? "No se han encontrado ofertas con los filtros seleccionados."
-                                            : "No se han encontrado demandas con los filtros seleccionados."
-                                    }
-
-                                </p>
-
-                            </div>
-
-                        ) : (
-
-                            <div className="listing-grid">
-
-                                {listings.map(
-                                    (listing) => (
-
-                                        <article
-                                            key={
-                                                listing.id
-                                            }
-                                            className="listing-card"
-                                        >
-
-                                            <div className="listing-card-header">
-
-                                                <span className="listing-category">
-
-                                                    {
-                                                        listing
-                                                            .category
-                                                            .name
-                                                    }
-
-                                                </span>
-
-
-                                                <span className="listing-hours">
-
-                                                    {
-                                                        listing
-                                                            .estimatedHours
-                                                    }
-
-                                                    {
-                                                        listing
-                                                            .estimatedHours === 1
-                                                            ? " hora"
-                                                            : " horas"
-                                                    }
-
-                                                </span>
-
-                                            </div>
-
-
-                                            <h2 className="listing-title">
-
-                                                {
-                                                    listing.title
-                                                }
-
+                                            <h2>
+                                                No hay anuncios
                                             </h2>
 
 
-                                            <p className="listing-description">
+                                            <p>
 
                                                 {
-                                                    listing.description
+                                                    isOffer
+                                                        ? "No se han encontrado ofertas con los filtros seleccionados."
+                                                        : "No se han encontrado demandas con los filtros seleccionados."
                                                 }
 
                                             </p>
 
+                                        </div>
 
-                                            <div className="listing-card-footer">
-
-                                                <div className="listing-author">
-
-                                                    <div className="listing-author-avatar">
-
-                                                        {
-                                                            listing
-                                                                .author
-                                                                .firstName
-                                                                .charAt(0)
-                                                                .toUpperCase()
-                                                        }
-
-                                                    </div>
-
-
-                                                    <span>
-
-                                                        {
-                                                            listing
-                                                                .author
-                                                                .firstName
-                                                        }
-
-                                                        {" "}
-
-                                                        {
-                                                            listing
-                                                                .author
-                                                                .lastName
-                                                        }
-
-                                                    </span>
-
-                                                </div>
-
-
-                                                <button
-                                                    type="button"
-                                                    className="listing-contact-button"
-                                                    disabled
-                                                    title="Disponible cuando implementemos el chat"
-                                                >
-                                                    Contactar
-                                                </button>
-
-                                            </div>
-
-                                        </article>
                                     )
-                                )}
+                                    : (
 
-                            </div>
-                        )}
+                                        <div className="listing-grid">
+
+                                            {
+                                                listings.map(
+                                                    (listing) => (
+
+                                                        <article
+                                                            key={
+                                                                listing.id
+                                                            }
+                                                            className="listing-card"
+                                                            role="button"
+                                                            tabIndex="0"
+                                                            onClick={
+                                                                () =>
+                                                                    openListing(
+                                                                        listing.id
+                                                                    )
+                                                            }
+                                                            onKeyDown={
+                                                                (event) =>
+                                                                    handleCardKeyDown(
+                                                                        event,
+                                                                        listing.id
+                                                                    )
+                                                            }
+                                                        >
+
+                                                            <div className="listing-card-header">
+
+                                                                <span className="listing-category">
+
+                                                                    {
+                                                                        listing
+                                                                            .category
+                                                                            .name
+                                                                    }
+
+                                                                </span>
+
+
+                                                                <span className="listing-hours">
+
+                                                                    {
+                                                                        listing
+                                                                            .estimatedHours
+                                                                    }
+
+                                                                    {
+                                                                        listing
+                                                                            .estimatedHours === 1
+                                                                            ? " hora"
+                                                                            : " horas"
+                                                                    }
+
+                                                                </span>
+
+                                                            </div>
+
+
+                                                            <h2 className="listing-title">
+
+                                                                {
+                                                                    listing.title
+                                                                }
+
+                                                            </h2>
+
+
+                                                            <p className="listing-description">
+
+                                                                {
+                                                                    listing.description
+                                                                }
+
+                                                            </p>
+
+
+                                                            <div className="listing-card-footer">
+
+                                                                <div className="listing-author">
+
+                                                                    <div className="listing-author-avatar">
+
+                                                                        {
+                                                                            listing
+                                                                                .author
+                                                                                .firstName
+                                                                                .charAt(0)
+                                                                                .toUpperCase()
+                                                                        }
+
+                                                                    </div>
+
+
+                                                                    <span>
+
+                                                                        {
+                                                                            listing
+                                                                                .author
+                                                                                .firstName
+                                                                        }
+
+                                                                        {" "}
+
+                                                                        {
+                                                                            listing
+                                                                                .author
+                                                                                .lastName
+                                                                        }
+
+                                                                    </span>
+
+                                                                </div>
+
+
+                                                                <span className="listing-details-link">
+                                                                    Contactar
+                                                                </span>
+
+                                                            </div>
+
+                                                        </article>
+                                                    )
+                                                )
+                                            }
+
+                                        </div>
+                                    )
+                        }
 
                     </main>
 

@@ -32,8 +32,6 @@
 }
 
 
-/* CABECERA */
-
 .listing-form-header {
     margin-bottom: 25px;
 
@@ -68,8 +66,6 @@
     line-height: 1.5;
 }
 
-
-/* FORM GENERATOR */
 
 .listing-form-card
 .class-profile-form {
@@ -111,16 +107,12 @@
 }
 
 
-/* TÍTULO */
-
 .listing-form-card
 .class-form > :nth-child(1) {
 
     grid-column: 1 / -1;
 }
 
-
-/* CATEGORÍA */
 
 .listing-form-card
 .class-form > :nth-child(2) {
@@ -129,8 +121,6 @@
 }
 
 
-/* HORAS */
-
 .listing-form-card
 .class-form > :nth-child(3) {
 
@@ -138,16 +128,12 @@
 }
 
 
-/* DESCRIPCIÓN */
-
 .listing-form-card
 .class-form > :nth-child(4) {
 
     grid-column: 1 / -1;
 }
 
-
-/* GRUPOS */
 
 .listing-form-card
 .class-form-group {
@@ -163,8 +149,6 @@
     margin: 0 !important;
 }
 
-
-/* LABELS */
 
 .listing-form-card
 .class-form-label {
@@ -187,8 +171,6 @@
     cursor: default;
 }
 
-
-/* INPUTS Y SELECT */
 
 .listing-form-card
 input.class-form-input,
@@ -223,8 +205,6 @@ select.class-form-input {
         box-shadow 0.2s;
 }
 
-
-/* TEXTAREA */
 
 .listing-form-card
 textarea.class-form-input {
@@ -285,8 +265,6 @@ textarea.class-form-input:focus {
 }
 
 
-/* EVITAMOS LABEL FLOTANTE */
-
 .listing-form-card
 .class-form-input:focus
 + .class-form-label,
@@ -304,8 +282,6 @@ textarea.class-form-input:focus {
         #252a34 !important;
 }
 
-
-/* ASTERISCO OBLIGATORIO */
 
 .listing-form-card
 input.class-form-input[required]
@@ -327,8 +303,6 @@ textarea.class-form-input[required]
         #dc3545 !important;
 }
 
-
-/* ERRORES */
 
 .listing-form-card
 .class-error-message {
@@ -360,8 +334,6 @@ textarea.class-form-input {
         #fff7f8;
 }
 
-
-/* BOTÓN */
 
 .listing-submit-button {
     width: 100% !important;
@@ -424,8 +396,6 @@ textarea.class-form-input {
 }
 
 
-/* CANCELAR */
-
 .listing-form-cancel {
     display: block;
 
@@ -448,8 +418,6 @@ textarea.class-form-input {
         underline;
 }
 
-
-/* RESPONSIVE */
 
 @media (
     max-width: 576px

@@ -15,8 +15,6 @@
 }
 
 
-/* CABECERA */
-
 .listings-header {
     display: flex;
     align-items: center;
@@ -79,8 +77,6 @@
 }
 
 
-/* DISTRIBUCIÓN */
-
 .listings-content {
     display: grid;
     grid-template-columns: 230px 1fr;
@@ -90,8 +86,6 @@
     align-items: start;
 }
 
-
-/* FILTROS */
 
 .listings-sidebar {
     padding: 20px;
@@ -210,8 +204,6 @@
 }
 
 
-/* LISTADO */
-
 .listings-main {
     min-width: 0;
 }
@@ -225,8 +217,6 @@
     gap: 16px;
 }
 
-
-/* TARJETA */
 
 .listing-card {
     min-height: 220px;
@@ -321,8 +311,6 @@
 }
 
 
-/* PIE DE TARJETA */
-
 .listing-card-footer {
     display: flex;
     align-items: center;
@@ -399,8 +387,6 @@
 }
 
 
-/* SIN RESULTADOS */
-
 .listings-empty,
 .listings-message {
     padding: 50px 25px;
@@ -432,8 +418,6 @@
 }
 
 
-/* RESPONSIVE */
-
 @media (max-width: 900px) {
 
     .listings-content {
@@ -462,5 +446,32 @@
 
     .create-listing-button {
         width: 100%;
+    }
+
+    .listing-card[role="button"] {
+    cursor: pointer;
+    }
+
+
+    .listing-card[role="button"]:focus {
+    outline: none;
+
+    border-color: #70a5f5;
+
+    box-shadow:
+        0 0 0 3px rgba(
+            70,
+            133,
+            230,
+            0.12
+        );
+    }
+
+
+    .listing-details-link {
+        color: #3478df;
+        
+        font-size: 11px;
+        font-weight: 600;
     }
 }
