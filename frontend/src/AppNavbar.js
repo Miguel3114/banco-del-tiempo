@@ -5,13 +5,16 @@ import React, {
 
 import {
     Collapse,
+    DropdownItem,
+    DropdownMenu,
+    DropdownToggle,
     Nav,
     Navbar,
     NavbarBrand,
-    NavbarText,
     NavbarToggler,
     NavItem,
-    NavLink
+    NavLink,
+    UncontrolledDropdown
 } from "reactstrap";
 
 import {
@@ -35,8 +38,8 @@ function AppNavbar() {
     const [roles, setRoles] =
         useState([]);
 
-    const [email, setEmail] =
-        useState("");
+    const [user, setUser] =
+        useState(null);
 
     const [collapsed, setCollapsed] =
         useState(true);
@@ -45,6 +48,9 @@ function AppNavbar() {
     const jwt =
         tokenService.getLocalAccessToken();
 
+    const storedUser =
+        tokenService.getUser();
+
 
     const toggleNavbar =
         () => setCollapsed(!collapsed);
@@ -52,26 +58,94 @@ function AppNavbar() {
 
     useEffect(() => {
 
-        if (jwt) {
-
-            const decodedToken =
-                jwt_decode(jwt);
-
-            setRoles(
-                decodedToken.authorities
-            );
-
-            setEmail(
-                decodedToken.sub
-            );
+        if (!jwt) {
+            return;
         }
+
+        const decodedToken =
+            jwt_decode(jwt);
+
+        setRoles(
+            decodedToken.authorities
+        );
+
+
+        fetch(
+            "/api/users/me",
+            {
+                headers: {
+                    Authorization:
+                        `Bearer ${jwt}`
+                }
+            }
+        )
+            .then((response) => {
+
+                if (!response.ok) {
+                    throw new Error();
+                }
+
+                return response.json();
+            })
+
+            .then((data) => {
+
+                setUser(data);
+            })
+
+            .catch(() => {
+
+                setUser(null);
+            });
 
     }, [jwt]);
 
 
+    function getUserInitials() {
+
+        if (
+            user?.firstName &&
+            user?.lastName
+        ) {
+
+            return (
+                user.firstName
+                    .charAt(0)
+                    .toUpperCase()
+                +
+                user.lastName
+                    .charAt(0)
+                    .toUpperCase()
+            );
+        }
+
+
+        if (user?.firstName) {
+
+            return user.firstName
+                .charAt(0)
+                .toUpperCase();
+        }
+
+
+        if (storedUser?.email) {
+
+            return storedUser.email
+                .charAt(0)
+                .toUpperCase();
+        }
+
+
+        return "?";
+    }
+
+
     let publicLinks = <></>;
+
     let userLinks = <></>;
-    let userLogout = <></>;
+
+    let userMenu = <></>;
+
     let adminLinks = <></>;
 
 
@@ -154,29 +228,96 @@ function AppNavbar() {
         );
 
 
-        userLogout = (
-            <>
+        userMenu = (
 
-                <NavbarText
-                    className="navbar-user-email"
+            <UncontrolledDropdown
+                nav
+                inNavbar
+                className="user-dropdown"
+            >
+
+                <DropdownToggle
+                    nav
+                    className="user-avatar-toggle"
                 >
-                    {email}
-                </NavbarText>
+
+                    {
+                        user?.profileImageUrl
+                            ? (
+
+                                <img
+                                    src={
+                                        user.profileImageUrl
+                                    }
+                                    alt="Perfil"
+                                    className="navbar-user-avatar"
+                                />
+
+                            )
+                            : (
+
+                                <div className="navbar-user-avatar-placeholder">
+
+                                    {
+                                        getUserInitials()
+                                    }
+
+                                </div>
+                            )
+                    }
 
 
-                <NavItem>
+                    <span className="navbar-avatar-chevron">
+                        ▾
+                    </span>
 
-                    <NavLink
+                </DropdownToggle>
+
+
+                <DropdownMenu
+                    end
+                    className="user-dropdown-menu"
+                >
+
+                    <DropdownItem
+                        disabled
+                        className="user-dropdown-item"
+                    >
+                        Mi perfil
+                    </DropdownItem>
+
+
+                    <DropdownItem
+                        tag={Link}
+                        to="/mylistings"
+                        className="user-dropdown-item"
+                    >
+                        Mis anuncios
+                    </DropdownItem>
+
+
+                    <DropdownItem
+                        disabled
+                        className="user-dropdown-item"
+                    >
+                        Mis intercambios
+                    </DropdownItem>
+
+
+                    <DropdownItem divider />
+
+
+                    <DropdownItem
                         tag={Link}
                         to="/logout"
-                        className="navbar-logout-link"
+                        className="user-dropdown-item user-dropdown-logout"
                     >
                         Cerrar sesión
-                    </NavLink>
+                    </DropdownItem>
 
-                </NavItem>
+                </DropdownMenu>
 
-            </>
+            </UncontrolledDropdown>
         );
     }
 
@@ -218,18 +359,22 @@ function AppNavbar() {
                 className="app-navbar-collapse"
             >
 
-                {jwt ? (
+                {
+                    jwt
+                        ? (
 
-                    <Nav
-                        className="navbar-center-links"
-                        navbar
-                    >
+                            <Nav
+                                className="navbar-center-links"
+                                navbar
+                            >
 
-                        {userLinks}
+                                {userLinks}
 
-                    </Nav>
+                            </Nav>
 
-                ) : null}
+                        )
+                        : null
+                }
 
 
                 <Nav
@@ -238,7 +383,8 @@ function AppNavbar() {
                 >
 
                     {publicLinks}
-                    {userLogout}
+
+                    {userMenu}
 
                 </Nav>
 
