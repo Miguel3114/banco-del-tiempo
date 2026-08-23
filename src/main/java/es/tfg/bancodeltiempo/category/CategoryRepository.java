@@ -7,9 +7,14 @@ import org.springframework.data.repository.CrudRepository;
 
 public interface CategoryRepository extends CrudRepository<Category, Integer> {
 
-    Optional<Category> findByName(String name);
+        List<Category> findAll();
 
-    Boolean existsByName(String name);
+        Optional<Category> findByName(
+                        String name);
 
-    List<Category> findByStatus(CategoryStatus status);
+        Boolean existsByName(
+                        String name);
+
+        List<Category> findByStatus(
+                        CategoryStatus status);
 }

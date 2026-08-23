@@ -1,46 +1,55 @@
 package es.tfg.bancodeltiempo.category;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import es.tfg.bancodeltiempo.exceptions.ResourceNotFoundException;
 
 @Service
 public class CategoryService {
 
-    private CategoryRepository categoryRepository;
+        private final CategoryRepository categoryRepository;
 
-    @Autowired
-    public CategoryService(CategoryRepository categoryRepository) {
-        this.categoryRepository = categoryRepository;
-    }
+        @Autowired
+        public CategoryService(CategoryRepository categoryRepository) {
 
-    @Transactional(readOnly = true)
-    public Optional<Category> findCategoryById(Integer id) {
-        return this.categoryRepository.findById(id);
-    }
+                this.categoryRepository = categoryRepository;
+        }
 
-    @Transactional(readOnly = true)
-    public Iterable<Category> findAllCategories() {
-        return this.categoryRepository.findAll();
-    }
+        @Transactional(readOnly = true)
+        public Category findCategoryById(Integer id) {
 
-    @Transactional(readOnly = true)
-    public List<Category> findActiveCategories() {
-        return this.categoryRepository.findByStatus(CategoryStatus.ACTIVE);
-    }
+                return this.categoryRepository.findById(id)
+                                .orElseThrow(() -> new ResourceNotFoundException(
+                                                "Categoría",
+                                                "id",
+                                                id));
+        }
 
-    @Transactional(readOnly = true)
-    public Boolean existsCategory(String name) {
-        return this.categoryRepository.existsByName(name);
-    }
+        @Transactional(readOnly = true)
+        public List<Category> findAllCategories() {
 
-    @Transactional
-    public Category saveCategory(Category category) throws DataAccessException {
-        this.categoryRepository.save(category);
-        return category;
-    }
+                return this.categoryRepository.findAll();
+        }
+
+        @Transactional(readOnly = true)
+        public List<Category> findActiveCategories() {
+
+                return this.categoryRepository.findByStatus(CategoryStatus.ACTIVE);
+        }
+
+        @Transactional(readOnly = true)
+        public Boolean existsCategory(String name) {
+
+                return this.categoryRepository.existsByName(name);
+        }
+
+        @Transactional
+        public Category saveCategory(Category category) {
+
+                return this.categoryRepository.save(category);
+        }
 }
