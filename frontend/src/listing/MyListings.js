@@ -27,11 +27,8 @@ export default function MyListings() {
     const [message, setMessage] =
         useState(null);
 
-
     const jwt =
-        tokenService
-            .getLocalAccessToken();
-
+        tokenService.getLocalAccessToken();
 
     const [listings, setListings] =
         useFetchState(
@@ -42,26 +39,23 @@ export default function MyListings() {
         );
 
 
-    function getDetailsRoute(
-        listing
-    ) {
+    function getDetailsRoute(listing) {
 
-        if (
-            listing.listingType ===
-            "OFFER"
-        ) {
-
-            return `/listings/${listing.id}`;
-        }
-
-
-        return `/requests/${listing.id}`;
+        return listing.listingType === "OFFER"
+            ? `/listings/${listing.id}`
+            : `/requests/${listing.id}`;
     }
 
 
-    function getListingType(
-        listingType
-    ) {
+    function getEditRoute(listing) {
+
+        return listing.listingType === "OFFER"
+            ? `/listings/${listing.id}/edit`
+            : `/requests/${listing.id}/edit`;
+    }
+
+
+    function getListingType(listingType) {
 
         return listingType === "OFFER"
             ? "Oferta"
@@ -69,12 +63,9 @@ export default function MyListings() {
     }
 
 
-    function handleDelete(
-        listingId
-    ) {
+    function handleDelete(listingId) {
 
         setMessage(null);
-
 
         deleteFromList(
             `/api/listings/${listingId}`,
@@ -102,7 +93,6 @@ export default function MyListings() {
                         <h1>
                             Mis anuncios
                         </h1>
-
 
                         <p>
                             Consulta y gestiona las ofertas
@@ -135,12 +125,10 @@ export default function MyListings() {
                                     No tienes anuncios activos
                                 </h2>
 
-
                                 <p>
                                     Cuando publiques una oferta
                                     o una demanda aparecerá aquí.
                                 </p>
-
 
                                 <div className="my-listings-empty-actions">
 
@@ -150,7 +138,6 @@ export default function MyListings() {
                                     >
                                         Crear oferta
                                     </Link>
-
 
                                     <Link
                                         to="/requests/new"
@@ -179,9 +166,7 @@ export default function MyListings() {
                                                 className="my-listing-card"
                                             >
 
-
                                                 <div className="my-listing-card-header">
-
 
                                                     <div className="my-listing-tags">
 
@@ -195,20 +180,17 @@ export default function MyListings() {
 
                                                         </span>
 
-
                                                         <span className="my-listing-type">
 
                                                             {
                                                                 getListingType(
-                                                                    listing
-                                                                        .listingType
+                                                                    listing.listingType
                                                                 )
                                                             }
 
                                                         </span>
 
                                                     </div>
-
 
                                                     <span className="my-listing-hours">
 
@@ -249,7 +231,6 @@ export default function MyListings() {
 
                                                 <div className="my-listing-actions">
 
-
                                                     <Link
                                                         to={
                                                             getDetailsRoute(
@@ -262,14 +243,16 @@ export default function MyListings() {
                                                     </Link>
 
 
-                                                    <button
-                                                        type="button"
+                                                    <Link
+                                                        to={
+                                                            getEditRoute(
+                                                                listing
+                                                            )
+                                                        }
                                                         className="my-listing-edit-button"
-                                                        disabled
-                                                        title="La edición se implementará en el siguiente paso"
                                                     >
                                                         Editar
-                                                    </button>
+                                                    </Link>
 
 
                                                     <button
@@ -284,7 +267,6 @@ export default function MyListings() {
                                                     >
                                                         Eliminar
                                                     </button>
-
 
                                                 </div>
 

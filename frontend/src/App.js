@@ -30,6 +30,9 @@ import ListingDetails
 import MyListings
     from "./listing/MyListings";
 
+import ListingEdit
+    from "./listing/ListingEdit";
+
 import PrivateRoute
     from "./privateRoute";
 
@@ -215,6 +218,24 @@ function App() {
 
                             <MyListings />
 
+                        </PrivateRoute>
+                    }
+                />
+
+                <Route
+                    path="/listings/:id/edit"
+                    element={
+                        <PrivateRoute>
+                            <ListingEdit />
+                        </PrivateRoute>
+                    }
+                />
+
+                <Route
+                    path="/requests/:id/edit"
+                    element={
+                        <PrivateRoute>
+                            <ListingEdit />
                         </PrivateRoute>
                     }
                 />
