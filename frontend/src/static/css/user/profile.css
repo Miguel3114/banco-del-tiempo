@@ -1,0 +1,231 @@
+.profile-page {
+    min-height: calc(100vh - 55px);
+    padding: 42px 20px 60px;
+    background-color: #f5f7fb;
+}
+
+.profile-container {
+    width: 100%;
+    max-width: 680px;
+    margin: 0 auto;
+}
+
+.profile-loading {
+    display: flex;
+    justify-content: center;
+    padding-top: 100px;
+}
+
+.profile-main-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    padding: 42px 55px 32px;
+    background-color: #ffffff;
+    border: 1px solid #e3e8f0;
+    border-radius: 12px;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.035);
+}
+
+.profile-avatar,
+.profile-avatar-placeholder {
+    width: 82px;
+    height: 82px;
+    border-radius: 50%;
+}
+
+.profile-avatar {
+    object-fit: cover;
+    border: 1px solid #e1e5eb;
+}
+
+.profile-avatar-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #3978d8;
+    color: #ffffff;
+    font-size: 22px;
+    font-weight: 700;
+}
+
+.profile-name {
+    margin: 18px 0 3px;
+    color: #272a33;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 27px;
+    font-weight: 600;
+    text-align: center;
+}
+
+.profile-rating {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    margin-bottom: 14px;
+}
+
+.profile-stars {
+    color: #ffb000;
+    font-size: 15px;
+    letter-spacing: 1px;
+}
+
+.profile-rating-value {
+    color: #7b8492;
+    font-size: 11px;
+}
+
+.profile-balance {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 7px 15px;
+    background-color: #eef5ff;
+    border-radius: 20px;
+}
+
+.profile-balance-label {
+    color: #8b95a4;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+.profile-balance-value {
+    color: #3c78d8;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.profile-biography {
+    width: 100%;
+    max-width: 520px;
+    margin: 27px auto 20px;
+    color: #6c7480;
+    font-size: 12px;
+    line-height: 1.65;
+    text-align: center;
+}
+
+.profile-skills {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    min-height: 26px;
+}
+
+.profile-skill {
+    padding: 5px 12px;
+    background-color: #e9f3ff;
+    border-radius: 16px;
+    color: #3478df;
+    font-size: 10px;
+    font-weight: 600;
+}
+
+.profile-skill:nth-child(2n) {
+    background-color: #e8f7f4;
+    color: #27927e;
+}
+
+.profile-skill:nth-child(3n) {
+    background-color: #f0eaff;
+    color: #8057ce;
+}
+
+.profile-skill:nth-child(4n) {
+    background-color: #fff0fa;
+    color: #b651a0;
+}
+
+.profile-no-skills {
+    color: #929aa7;
+    font-size: 11px;
+}
+
+.profile-edit-button {
+    margin-top: 21px;
+    padding: 8px 19px;
+    background-color: #ffffff;
+    border: 1px solid #dce2eb;
+    border-radius: 6px;
+    color: #3d4654;
+    font-size: 11px;
+    font-weight: 500;
+}
+
+.profile-edit-button:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+}
+
+.profile-reviews {
+    margin-top: 34px;
+}
+
+.profile-reviews-title {
+    margin: 0 0 18px;
+    color: #292d36;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.profile-reviews-empty {
+    padding: 32px 25px;
+    background-color: #ffffff;
+    border: 1px solid #e5e9f0;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.025);
+}
+
+.profile-reviews-empty-star {
+    display: block;
+    margin-bottom: 8px;
+    color: #ffb000;
+    font-size: 20px;
+}
+
+.profile-reviews-empty h3 {
+    margin: 0 0 6px;
+    color: #454c58;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.profile-reviews-empty p {
+    margin: 0;
+    color: #8a929e;
+    font-size: 11px;
+}
+
+@media (max-width: 700px) {
+
+    .profile-page {
+        padding: 25px 14px 45px;
+    }
+
+    .profile-main-card {
+        padding: 32px 22px 27px;
+    }
+
+    .profile-avatar,
+    .profile-avatar-placeholder {
+        width: 72px;
+        height: 72px;
+    }
+
+    .profile-name {
+        font-size: 23px;
+    }
+
+    .profile-biography {
+        font-size: 11px;
+    }
+}

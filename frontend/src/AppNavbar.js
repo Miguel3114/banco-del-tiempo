@@ -280,7 +280,8 @@ function AppNavbar() {
                 >
 
                     <DropdownItem
-                        disabled
+                        tag={Link}
+                        to="/profile"
                         className="user-dropdown-item"
                     >
                         Mi perfil
