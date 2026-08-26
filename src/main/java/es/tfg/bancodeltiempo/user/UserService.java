@@ -1,78 +1,119 @@
 package es.tfg.bancodeltiempo.user;
 
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Locale;
+import java.util.Set;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.io.IOException;
 import org.springframework.web.multipart.MultipartFile;
+
+import es.tfg.bancodeltiempo.exceptions.ConflictException;
+import es.tfg.bancodeltiempo.skill.Skill;
+import es.tfg.bancodeltiempo.skill.SkillService;
 
 @Service
 public class UserService {
 
-    private UserRepository userRepository;
+        private final UserRepository userRepository;
+        private final ProfileImageService profileImageService;
+        private final SkillService skillService;
+        private final PasswordEncoder passwordEncoder;
 
-    private ProfileImageService profileImageService;
+        @Autowired
+        public UserService(UserRepository userRepository, ProfileImageService profileImageService,
+                        SkillService skillService, PasswordEncoder passwordEncoder) {
 
-    @Autowired
-    public UserService(
-            UserRepository userRepository,
-            ProfileImageService profileImageService) {
+                this.userRepository = userRepository;
+                this.profileImageService = profileImageService;
+                this.skillService = skillService;
+                this.passwordEncoder = passwordEncoder;
+        }
 
-        this.userRepository = userRepository;
+        @Transactional
+        public User saveUser(User user) throws DataAccessException {
 
-        this.profileImageService = profileImageService;
-    }
+                this.userRepository.save(user);
 
-    @Transactional
-    public User saveUser(User user)
-            throws DataAccessException {
+                return user;
+        }
 
-        this.userRepository.save(user);
+        public Boolean existsUser(String email) {
 
-        return user;
-    }
+                return this.userRepository.existsByEmail(email);
+        }
 
-    public Boolean existsUser(String email) {
-        return this.userRepository
-            .existsByEmail(email);
-    }
+        @Transactional(readOnly = true)
+        public User findCurrentUser() {
 
-    @Transactional(readOnly = true)
-    public User findCurrentUser() {
+                String email = SecurityContextHolder.getContext().getAuthentication().getName();
 
-        String email = SecurityContextHolder
-            .getContext()
-            .getAuthentication()
-            .getName();
+                return this.userRepository.findByEmail(email)
+                                .orElseThrow(() -> new IllegalArgumentException(
+                                                "Usuario no encontrado"));
+        }
 
-        return this.userRepository
-            .findByEmail(email)
-            .orElseThrow(() ->
-                new IllegalArgumentException(
-                    "Usuario no encontrado"
-                )
-            );
-    }
+        @Transactional
+        public User updateProfile(UserUpdateRequest request) {
 
-    @Transactional
-    public User updateProfileImage(
-            MultipartFile file)
-            throws IOException {
+                User user = this.findCurrentUser();
 
-        User user = this.findCurrentUser();
+                String email = request.getEmail()
+                                .trim()
+                                .toLowerCase(Locale.ROOT);
 
-        String profileImageUrl = this.profileImageService
-                .saveProfileImage(
-                        file,
-                        user.getId());
+                if (!email.equals(user.getEmail()) && this.existsUser(email)) {
+                        throw new ConflictException(
+                                        "El correo electrónico ya está registrado");
+                }
 
-        user.setProfileImageUrl(
-                profileImageUrl);
+                if (request.getSkillIds() != null) {
 
-        this.userRepository.save(user);
+                        Set<Skill> skills = new HashSet<>(
+                                        this.skillService.findSkillsByIds(
+                                                        request.getSkillIds()));
 
-        return user;
-    }
+                        if (skills.size() != request.getSkillIds().size()) {
+                                throw new IllegalArgumentException(
+                                                "Una o varias habilidades no existen");
+                        }
+
+                        user.setSkills(skills);
+                }
+
+                user.setFirstName(request.getFirstName().trim());
+                user.setLastName(request.getLastName().trim());
+                user.setEmail(email);
+                user.setBiography(
+                                request.getBiography() != null
+                                                ? request.getBiography().trim()
+                                                : null);
+
+                if (request.getPassword() != null && !request.getPassword().isBlank()) {
+                        user.setPassword(
+                                        this.passwordEncoder.encode(
+                                                        request.getPassword()));
+                }
+
+                return this.userRepository.save(user);
+        }
+
+        @Transactional
+        public User updateProfileImage(MultipartFile file) throws IOException {
+
+                User user = this.findCurrentUser();
+
+                String profileImageUrl = this.profileImageService.saveProfileImage(
+                                file,
+                                user.getId());
+
+                user.setProfileImageUrl(profileImageUrl);
+
+                return this.userRepository.save(user);
+        }
 }
