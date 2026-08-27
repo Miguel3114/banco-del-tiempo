@@ -213,16 +213,16 @@ export default function Listings({
 
 
     function openListing(
-    listingId
-) {
+        listingId
+    ) {
 
-    const route =
-        isOffer
-            ? `/listings/${listingId}`
-            : `/requests/${listingId}`;
+        const route =
+            isOffer
+                ? `/listings/${listingId}`
+                : `/requests/${listingId}`;
 
-    navigate(route);
-}
+        navigate(route);
+    }
 
 
     function handleCardKeyDown(
@@ -535,9 +535,30 @@ export default function Listings({
                                                                         {
                                                                             listing
                                                                                 .author
-                                                                                .firstName
-                                                                                .charAt(0)
-                                                                                .toUpperCase()
+                                                                                .profileImageUrl
+                                                                                ? (
+
+                                                                                    <img
+                                                                                        src={
+                                                                                            listing
+                                                                                                .author
+                                                                                                .profileImageUrl
+                                                                                        }
+                                                                                        alt={
+                                                                                            `${listing.author.firstName} ${listing.author.lastName}`
+                                                                                        }
+                                                                                        className="listing-author-avatar-image"
+                                                                                    />
+
+                                                                                )
+                                                                                : (
+
+                                                                                    listing
+                                                                                        .author
+                                                                                        .firstName
+                                                                                        .charAt(0)
+                                                                                        .toUpperCase()
+                                                                                )
                                                                         }
 
                                                                     </div>
