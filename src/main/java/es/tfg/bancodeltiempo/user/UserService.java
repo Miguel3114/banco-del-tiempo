@@ -103,10 +103,11 @@ public class UserService {
                 return this.userRepository.save(user);
         }
 
-        @Transactional
         public User updateProfileImage(MultipartFile file) throws IOException {
 
                 User user = this.findCurrentUser();
+
+                String oldProfileImageUrl = user.getProfileImageUrl();
 
                 String profileImageUrl = this.profileImageService.saveProfileImage(
                                 file,
@@ -114,6 +115,31 @@ public class UserService {
 
                 user.setProfileImageUrl(profileImageUrl);
 
-                return this.userRepository.save(user);
+                User updatedUser = this.userRepository.save(user);
+
+                if (oldProfileImageUrl != null && !oldProfileImageUrl.isBlank()) {
+                        this.profileImageService.deleteProfileImage(
+                                        oldProfileImageUrl);
+                }
+
+                return updatedUser;
+        }
+
+        public User deleteProfileImage() throws IOException {
+
+                User user = this.findCurrentUser();
+
+                String profileImageUrl = user.getProfileImageUrl();
+
+                user.setProfileImageUrl(null);
+
+                User updatedUser = this.userRepository.save(user);
+
+                if (profileImageUrl != null && !profileImageUrl.isBlank()) {
+                        this.profileImageService.deleteProfileImage(
+                                        profileImageUrl);
+                }
+
+                return updatedUser;
         }
 }

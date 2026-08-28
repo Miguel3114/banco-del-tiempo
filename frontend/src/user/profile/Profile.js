@@ -13,6 +13,9 @@ import tokenService
 
 import "../../static/css/user/profile.css";
 
+import {
+    Link
+} from "react-router-dom";
 
 export default function Profile() {
 
@@ -306,13 +309,12 @@ export default function Profile() {
                     </div>
 
 
-                    <button
-                        type="button"
+                    <Link
+                        to="/profile/edit"
                         className="profile-edit-button"
-                        disabled
                     >
                         Editar Perfil
-                    </button>
+                    </Link>
 
                 </section>
 

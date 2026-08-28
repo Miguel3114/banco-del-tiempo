@@ -79,6 +79,31 @@ public class ProfileImageService {
             fileName;
     }
 
+    public void deleteProfileImage(
+            String profileImageUrl)
+            throws IOException {
+
+        if (
+            profileImageUrl == null ||
+            profileImageUrl.isBlank()
+        ) {
+            return;
+        }
+
+        String fileName =
+            Paths.get(profileImageUrl)
+                .getFileName()
+                .toString();
+
+        Path imagePath =
+            this.profileImagesDirectory
+                .resolve(fileName);
+
+        Files.deleteIfExists(
+            imagePath
+        );
+    }
+
     private String getExtension(
             MultipartFile file) {
 

@@ -5,6 +5,7 @@ import java.io.IOException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -67,6 +68,21 @@ public class UserRestController {
 
                         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                                         .body("No se ha podido guardar la imagen");
+                }
+        }
+
+        @DeleteMapping("/me/profile-image")
+        public ResponseEntity<?> deleteProfileImage() {
+
+                try {
+
+                        return ResponseEntity.ok(
+                                        this.userService.deleteProfileImage());
+
+                } catch (IOException exception) {
+
+                        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                                        .body("No se ha podido eliminar la imagen");
                 }
         }
 }

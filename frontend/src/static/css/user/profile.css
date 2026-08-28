@@ -228,4 +228,13 @@
     .profile-biography {
         font-size: 11px;
     }
+
+    .profile-edit-button {
+        text-decoration: none;
+    }
+    
+    .profile-edit-button:hover {
+        color: #3d4654;
+        background-color: #f7f9fc;
+    }
 }

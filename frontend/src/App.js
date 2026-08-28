@@ -36,6 +36,9 @@ import MyListings
 import Profile
     from "./user/profile/Profile";
 
+import ProfileEdit
+    from "./user/profile/ProfileEdit";
+
 import PrivateRoute
     from "./privateRoute";
 
@@ -198,6 +201,15 @@ function App() {
                     element={
                         <PrivateRoute>
                             <Profile />
+                        </PrivateRoute>
+                    }
+                />
+
+                <Route
+                    path="/profile/edit"
+                    element={
+                        <PrivateRoute>
+                            <ProfileEdit />
                         </PrivateRoute>
                     }
                 />
