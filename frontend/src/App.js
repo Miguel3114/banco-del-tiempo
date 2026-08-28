@@ -27,11 +27,17 @@ import ListingCreate
 import ListingDetails
     from "./listing/ListingDetails";
 
+import ListingEdit
+    from "./listing/ListingEdit";
+
 import MyListings
     from "./listing/MyListings";
 
-import ListingEdit
-    from "./listing/ListingEdit";
+import Profile
+    from "./user/profile/Profile";
+
+import ProfileEdit
+    from "./user/profile/ProfileEdit";
 
 import PrivateRoute
     from "./privateRoute";
@@ -43,51 +49,36 @@ import tokenService
 function App() {
 
     const jwt =
-        tokenService
-            .getLocalAccessToken();
-
+        tokenService.getLocalAccessToken();
 
     let roles = [];
 
-
     if (jwt) {
-
-        roles =
-            getRolesFromJWT(jwt);
+        roles = getRolesFromJWT(jwt);
     }
 
 
-    function getRolesFromJWT(
-        token
-    ) {
+    function getRolesFromJWT(token) {
 
-        return jwt_decode(
-            token
-        ).authorities;
+        return jwt_decode(token).authorities;
     }
 
 
     let publicRoutes = <></>;
-
     let userRoutes = <></>;
-
     let adminRoutes = <></>;
 
 
-    roles.forEach(
-        (role) => {
+    roles.forEach((role) => {
 
-            if (
-                role === "ADMIN"
-            ) {
+        if (role === "ADMIN") {
 
-                adminRoutes = (
-                    <>
-                    </>
-                );
-            }
+            adminRoutes = (
+                <>
+                </>
+            );
         }
-    );
+    });
 
 
     if (!jwt) {
@@ -101,7 +92,6 @@ function App() {
                         <Register />
                     }
                 />
-
 
                 <Route
                     path="/login"
@@ -125,75 +115,47 @@ function App() {
                     }
                 />
 
-
                 <Route
                     path="/listings"
                     element={
-
                         <PrivateRoute>
-
-                            <Listings
-                                listingType="OFFER"
-                            />
-
+                            <Listings listingType="OFFER" />
                         </PrivateRoute>
                     }
                 />
-
 
                 <Route
                     path="/requests"
                     element={
-
                         <PrivateRoute>
-
-                            <Listings
-                                listingType="REQUEST"
-                            />
-
+                            <Listings listingType="REQUEST" />
                         </PrivateRoute>
                     }
                 />
-
 
                 <Route
                     path="/listings/new"
                     element={
-
                         <PrivateRoute>
-
-                            <ListingCreate
-                                listingType="OFFER"
-                            />
-
+                            <ListingCreate listingType="OFFER" />
                         </PrivateRoute>
                     }
                 />
-
 
                 <Route
                     path="/requests/new"
                     element={
-
                         <PrivateRoute>
-
-                            <ListingCreate
-                                listingType="REQUEST"
-                            />
-
+                            <ListingCreate listingType="REQUEST" />
                         </PrivateRoute>
                     }
                 />
 
-
                 <Route
                     path="/listings/:id"
                     element={
-
                         <PrivateRoute>
-
                             <ListingDetails />
-
                         </PrivateRoute>
                     }
                 />
@@ -201,23 +163,8 @@ function App() {
                 <Route
                     path="/requests/:id"
                     element={
-
                         <PrivateRoute>
-
                             <ListingDetails />
-
-                        </PrivateRoute>
-                    }
-                />
-
-                <Route
-                    path="/mylistings"
-                    element={
-
-                        <PrivateRoute>
-
-                            <MyListings />
-
                         </PrivateRoute>
                     }
                 />
@@ -236,6 +183,33 @@ function App() {
                     element={
                         <PrivateRoute>
                             <ListingEdit />
+                        </PrivateRoute>
+                    }
+                />
+
+                <Route
+                    path="/mylistings"
+                    element={
+                        <PrivateRoute>
+                            <MyListings />
+                        </PrivateRoute>
+                    }
+                />
+
+                <Route
+                    path="/profile"
+                    element={
+                        <PrivateRoute>
+                            <Profile />
+                        </PrivateRoute>
+                    }
+                />
+
+                <Route
+                    path="/profile/edit"
+                    element={
+                        <PrivateRoute>
+                            <ProfileEdit />
                         </PrivateRoute>
                     }
                 />
@@ -259,18 +233,11 @@ function App() {
                     element={
                         jwt
                             ? (
-
                                 <PrivateRoute>
-
-                                    <Listings
-                                        listingType="OFFER"
-                                    />
-
+                                    <Listings listingType="OFFER" />
                                 </PrivateRoute>
-
                             )
                             : (
-
                                 <Login />
                             )
                     }
