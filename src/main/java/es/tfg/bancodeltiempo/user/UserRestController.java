@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,68 +22,61 @@ import jakarta.validation.Valid;
 @RequestMapping("/api/users")
 public class UserRestController {
 
-        private final UserService userService;
+    private final UserService userService;
 
-        @Autowired
-        public UserRestController(UserService userService) {
+    @Autowired
+    public UserRestController(UserService userService) {
+        this.userService = userService;
+    }
 
-                this.userService = userService;
+    @GetMapping("/me")
+    public ResponseEntity<User> findCurrentUser() {
+        return ResponseEntity.ok(this.userService.findCurrentUser());
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<?> findUser(@PathVariable Integer id) {
+        try {
+            User user = this.userService.findUser(id);
+            return ResponseEntity.ok(new UserDTO(user));
+
+        } catch (IllegalArgumentException exception) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exception.getMessage());
         }
+    }
 
-        @GetMapping("/me")
-        public ResponseEntity<User> findCurrentUser() {
+    @PutMapping("/me")
+    public ResponseEntity<?> updateCurrentUser(@Valid @RequestBody UserUpdateRequest request) {
+        try {
+            return ResponseEntity.ok(this.userService.updateProfile(request));
 
-                return ResponseEntity.ok(
-                                this.userService.findCurrentUser());
+        } catch (IllegalArgumentException exception) {
+            return ResponseEntity.badRequest().body(exception.getMessage());
         }
+    }
 
-        @PutMapping("/me")
-        public ResponseEntity<?> updateCurrentUser(@Valid @RequestBody UserUpdateRequest request) {
+    @PostMapping("/me/profile-image")
+    public ResponseEntity<?> updateProfileImage(@RequestParam("file") MultipartFile file) {
+        try {
+            return ResponseEntity.ok(this.userService.updateProfileImage(file));
 
-                try {
+        } catch (IllegalArgumentException exception) {
+            return ResponseEntity.badRequest().body(exception.getMessage());
 
-                        return ResponseEntity.ok(
-                                        this.userService.updateProfile(request));
-
-                } catch (IllegalArgumentException exception) {
-
-                        return ResponseEntity.badRequest()
-                                        .body(exception.getMessage());
-                }
+        } catch (IOException exception) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("No se ha podido guardar la imagen");
         }
+    }
 
-        @PostMapping("/me/profile-image")
-        public ResponseEntity<?> updateProfileImage(@RequestParam("file") MultipartFile file) {
+    @DeleteMapping("/me/profile-image")
+    public ResponseEntity<?> deleteProfileImage() {
+        try {
+            return ResponseEntity.ok(this.userService.deleteProfileImage());
 
-                try {
-
-                        return ResponseEntity.ok(
-                                        this.userService.updateProfileImage(file));
-
-                } catch (IllegalArgumentException exception) {
-
-                        return ResponseEntity.badRequest()
-                                        .body(exception.getMessage());
-
-                } catch (IOException exception) {
-
-                        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                        .body("No se ha podido guardar la imagen");
-                }
+        } catch (IOException exception) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("No se ha podido eliminar la imagen");
         }
-
-        @DeleteMapping("/me/profile-image")
-        public ResponseEntity<?> deleteProfileImage() {
-
-                try {
-
-                        return ResponseEntity.ok(
-                                        this.userService.deleteProfileImage());
-
-                } catch (IOException exception) {
-
-                        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                        .body("No se ha podido eliminar la imagen");
-                }
-        }
+    }
 }

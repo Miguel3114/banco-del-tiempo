@@ -39,6 +39,9 @@ import Profile
 import ProfileEdit
     from "./user/profile/ProfileEdit";
 
+import PublicProfile
+    from "./user/profile/PublicProfile";
+
 import PrivateRoute
     from "./privateRoute";
 
@@ -210,6 +213,15 @@ function App() {
                     element={
                         <PrivateRoute>
                             <ProfileEdit />
+                        </PrivateRoute>
+                    }
+                />
+
+                <Route
+                    path="/users/:id"
+                    element={
+                        <PrivateRoute>
+                            <PublicProfile />
                         </PrivateRoute>
                     }
                 />

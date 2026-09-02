@@ -174,11 +174,29 @@
 }
 
 
+.listing-details-author-link {
+    display: inline-block;
+
+    color: inherit;
+
+    text-decoration: none;
+}
+
+
+.listing-details-author-link:hover {
+    color: inherit;
+
+    text-decoration: none;
+}
+
+
 .listing-details-author {
     display: flex;
     align-items: center;
 
     gap: 11px;
+
+    cursor: pointer;
 }
 
 
@@ -233,6 +251,14 @@
 
     font-size: 13px;
     font-weight: 600;
+
+    transition: color 0.2s;
+}
+
+
+.listing-details-author-link:hover
+.listing-details-author-name {
+    color: #3478df;
 }
 
 
@@ -317,6 +343,11 @@
     .listing-details-author-section {
         align-items: stretch;
         flex-direction: column;
+    }
+
+
+    .listing-details-author-link {
+        width: fit-content;
     }
 
 

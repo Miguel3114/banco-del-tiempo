@@ -20,126 +20,102 @@ import es.tfg.bancodeltiempo.skill.SkillService;
 @Service
 public class UserService {
 
-        private final UserRepository userRepository;
-        private final ProfileImageService profileImageService;
-        private final SkillService skillService;
-        private final PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
+    private final ProfileImageService profileImageService;
+    private final SkillService skillService;
+    private final PasswordEncoder passwordEncoder;
 
-        @Autowired
-        public UserService(UserRepository userRepository, ProfileImageService profileImageService,
-                        SkillService skillService, PasswordEncoder passwordEncoder) {
+    @Autowired
+    public UserService(UserRepository userRepository, ProfileImageService profileImageService,
+            SkillService skillService, PasswordEncoder passwordEncoder) {
+        this.userRepository = userRepository;
+        this.profileImageService = profileImageService;
+        this.skillService = skillService;
+        this.passwordEncoder = passwordEncoder;
+    }
 
-                this.userRepository = userRepository;
-                this.profileImageService = profileImageService;
-                this.skillService = skillService;
-                this.passwordEncoder = passwordEncoder;
+    @Transactional
+    public User saveUser(User user) throws DataAccessException {
+        this.userRepository.save(user);
+        return user;
+    }
+
+    public Boolean existsUser(String email) {
+        return this.userRepository.existsByEmail(email);
+    }
+
+    @Transactional(readOnly = true)
+    public User findCurrentUser() {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        return this.userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
+    }
+
+    @Transactional(readOnly = true)
+    public User findUser(Integer id) {
+        return this.userRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
+    }
+
+    @Transactional
+    public User updateProfile(UserUpdateRequest request) {
+        User user = this.findCurrentUser();
+
+        String email = request.getEmail().trim().toLowerCase(Locale.ROOT);
+
+        if (!email.equals(user.getEmail()) && this.existsUser(email)) {
+            throw new ConflictException("El correo electrónico ya está registrado");
         }
 
-        @Transactional
-        public User saveUser(User user) throws DataAccessException {
+        if (request.getSkillIds() != null) {
+            Set<Skill> skills = new HashSet<>(this.skillService.findSkillsByIds(request.getSkillIds()));
 
-                this.userRepository.save(user);
+            if (skills.size() != request.getSkillIds().size()) {
+                throw new IllegalArgumentException("Una o varias habilidades no existen");
+            }
 
-                return user;
+            user.setSkills(skills);
         }
 
-        public Boolean existsUser(String email) {
+        user.setFirstName(request.getFirstName().trim());
+        user.setLastName(request.getLastName().trim());
+        user.setEmail(email);
+        user.setBiography(request.getBiography() != null ? request.getBiography().trim() : null);
 
-                return this.userRepository.existsByEmail(email);
+        if (request.getPassword() != null && !request.getPassword().isBlank()) {
+            user.setPassword(this.passwordEncoder.encode(request.getPassword()));
         }
 
-        @Transactional(readOnly = true)
-        public User findCurrentUser() {
+        return this.userRepository.save(user);
+    }
 
-                String email = SecurityContextHolder.getContext().getAuthentication().getName();
+    public User updateProfileImage(MultipartFile file) throws IOException {
+        User user = this.findCurrentUser();
+        String oldProfileImageUrl = user.getProfileImageUrl();
+        String profileImageUrl = this.profileImageService.saveProfileImage(file, user.getId());
 
-                return this.userRepository.findByEmail(email)
-                                .orElseThrow(() -> new IllegalArgumentException(
-                                                "Usuario no encontrado"));
+        user.setProfileImageUrl(profileImageUrl);
+        User updatedUser = this.userRepository.save(user);
+
+        if (oldProfileImageUrl != null && !oldProfileImageUrl.isBlank()) {
+            this.profileImageService.deleteProfileImage(oldProfileImageUrl);
         }
 
-        @Transactional
-        public User updateProfile(UserUpdateRequest request) {
+        return updatedUser;
+    }
 
-                User user = this.findCurrentUser();
+    public User deleteProfileImage() throws IOException {
+        User user = this.findCurrentUser();
+        String profileImageUrl = user.getProfileImageUrl();
 
-                String email = request.getEmail()
-                                .trim()
-                                .toLowerCase(Locale.ROOT);
+        user.setProfileImageUrl(null);
+        User updatedUser = this.userRepository.save(user);
 
-                if (!email.equals(user.getEmail()) && this.existsUser(email)) {
-                        throw new ConflictException(
-                                        "El correo electrónico ya está registrado");
-                }
-
-                if (request.getSkillIds() != null) {
-
-                        Set<Skill> skills = new HashSet<>(
-                                        this.skillService.findSkillsByIds(
-                                                        request.getSkillIds()));
-
-                        if (skills.size() != request.getSkillIds().size()) {
-                                throw new IllegalArgumentException(
-                                                "Una o varias habilidades no existen");
-                        }
-
-                        user.setSkills(skills);
-                }
-
-                user.setFirstName(request.getFirstName().trim());
-                user.setLastName(request.getLastName().trim());
-                user.setEmail(email);
-                user.setBiography(
-                                request.getBiography() != null
-                                                ? request.getBiography().trim()
-                                                : null);
-
-                if (request.getPassword() != null && !request.getPassword().isBlank()) {
-                        user.setPassword(
-                                        this.passwordEncoder.encode(
-                                                        request.getPassword()));
-                }
-
-                return this.userRepository.save(user);
+        if (profileImageUrl != null && !profileImageUrl.isBlank()) {
+            this.profileImageService.deleteProfileImage(profileImageUrl);
         }
 
-        public User updateProfileImage(MultipartFile file) throws IOException {
-
-                User user = this.findCurrentUser();
-
-                String oldProfileImageUrl = user.getProfileImageUrl();
-
-                String profileImageUrl = this.profileImageService.saveProfileImage(
-                                file,
-                                user.getId());
-
-                user.setProfileImageUrl(profileImageUrl);
-
-                User updatedUser = this.userRepository.save(user);
-
-                if (oldProfileImageUrl != null && !oldProfileImageUrl.isBlank()) {
-                        this.profileImageService.deleteProfileImage(
-                                        oldProfileImageUrl);
-                }
-
-                return updatedUser;
-        }
-
-        public User deleteProfileImage() throws IOException {
-
-                User user = this.findCurrentUser();
-
-                String profileImageUrl = user.getProfileImageUrl();
-
-                user.setProfileImageUrl(null);
-
-                User updatedUser = this.userRepository.save(user);
-
-                if (profileImageUrl != null && !profileImageUrl.isBlank()) {
-                        this.profileImageService.deleteProfileImage(
-                                        profileImageUrl);
-                }
-
-                return updatedUser;
-        }
+        return updatedUser;
+    }
 }

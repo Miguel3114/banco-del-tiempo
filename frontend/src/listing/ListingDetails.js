@@ -300,70 +300,79 @@ export default function ListingDetails() {
 
                     <div className="listing-details-author-section">
 
-                        <div className="listing-details-author">
-
-
-                            {
-                                listing.author
-                                    .profileImageUrl
-                                    ? (
-
-                                        <img
-                                            src={
-                                                listing
-                                                    .author
-                                                    .profileImageUrl
-                                            }
-                                            alt={
-                                                listing
-                                                    .author
-                                                    .firstName
-                                            }
-                                            className="listing-details-avatar-image"
-                                        />
-
-                                    )
-                                    : (
-
-                                        <div className="listing-details-avatar">
-
-                                            {
-                                                authorInitial
-                                            }
-
-                                        </div>
-                                    )
+                        <Link
+                            to={
+                                `/users/${listing.author.id}`
                             }
+                            className="listing-details-author-link"
+                        >
+
+                            <div className="listing-details-author">
 
 
-                            <div>
+                                {
+                                    listing.author
+                                        .profileImageUrl
+                                        ? (
 
-                                <span className="listing-details-author-label">
-                                    Publicado por
-                                </span>
+                                            <img
+                                                src={
+                                                    listing
+                                                        .author
+                                                        .profileImageUrl
+                                                }
+                                                alt={
+                                                    listing
+                                                        .author
+                                                        .firstName
+                                                }
+                                                className="listing-details-avatar-image"
+                                            />
+
+                                        )
+                                        : (
+
+                                            <div className="listing-details-avatar">
+
+                                                {
+                                                    authorInitial
+                                                }
+
+                                            </div>
+                                        )
+                                }
 
 
-                                <p className="listing-details-author-name">
+                                <div>
 
-                                    {
-                                        listing
-                                            .author
-                                            .firstName
-                                    }
+                                    <span className="listing-details-author-label">
+                                        Publicado por
+                                    </span>
 
-                                    {" "}
 
-                                    {
-                                        listing
-                                            .author
-                                            .lastName
-                                    }
+                                    <p className="listing-details-author-name">
 
-                                </p>
+                                        {
+                                            listing
+                                                .author
+                                                .firstName
+                                        }
+
+                                        {" "}
+
+                                        {
+                                            listing
+                                                .author
+                                                .lastName
+                                        }
+
+                                    </p>
+
+                                </div>
 
                             </div>
 
-                        </div>
+                        </Link>
 
 
                         <button
