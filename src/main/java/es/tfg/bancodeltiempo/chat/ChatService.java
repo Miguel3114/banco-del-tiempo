@@ -7,6 +7,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import es.tfg.bancodeltiempo.exceptions.ConflictException;
+import es.tfg.bancodeltiempo.exceptions.ResourceNotFoundException;
+import es.tfg.bancodeltiempo.exceptions.ResourceNotOwnedException;
 import es.tfg.bancodeltiempo.listing.Listing;
 import es.tfg.bancodeltiempo.listing.ListingService;
 import es.tfg.bancodeltiempo.user.User;
@@ -55,5 +57,45 @@ public class ChatService {
         chat.setInterestedUserStatus(ChatStatus.ACTIVE);
 
         return this.chatRepository.save(chat);
+    }
+
+    @Transactional(readOnly = true)
+    public Chat findChat(Integer id) {
+        Chat chat = this.chatRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Chat",
+                        "id",
+                        id));
+
+        User currentUser = this.userService.findCurrentUser();
+
+        this.checkParticipant(chat, currentUser);
+        this.checkChatIsActive(chat, currentUser);
+
+        return chat;
+    }
+
+    public void checkParticipant(Chat chat, User user) {
+        boolean isAuthor = chat.getListing().getAuthor().getId().equals(user.getId());
+        boolean isInterestedUser = chat.getInterestedUser().getId().equals(user.getId());
+
+        if (!isAuthor && !isInterestedUser) {
+            throw new ResourceNotOwnedException("No puedes acceder a este chat");
+        }
+    }
+
+    public void checkChatIsActive(Chat chat, User user) {
+        if (chat.getListing().getAuthor().getId().equals(user.getId())) {
+
+            if (chat.getAuthorStatus() == ChatStatus.ARCHIVED) {
+                throw new ConflictException("Este chat está archivado");
+            }
+
+        } else {
+
+            if (chat.getInterestedUserStatus() == ChatStatus.ARCHIVED) {
+                throw new ConflictException("Este chat está archivado");
+            }
+        }
     }
 }
