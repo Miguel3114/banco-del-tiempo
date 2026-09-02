@@ -426,6 +426,29 @@
 }
 
 
+.listing-author-link {
+    color: inherit;
+    text-decoration: none;
+}
+
+.listing-author-link:hover {
+    color: inherit;
+    text-decoration: none;
+}
+
+.listing-author-link .listing-author {
+    cursor: pointer;
+}
+
+.listing-author-link .listing-author span {
+    transition: color 0.2s;
+}
+
+.listing-author-link:hover .listing-author span {
+    color: #3478df;
+}
+
+
 @media (max-width: 900px) {
 
     .listings-content {
