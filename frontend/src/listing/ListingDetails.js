@@ -9,6 +9,7 @@ import {
 
 import {
     Link,
+    useNavigate,
     useParams
 } from "react-router-dom";
 
@@ -23,6 +24,9 @@ export default function ListingDetails() {
     const { id } =
         useParams();
 
+    const navigate =
+        useNavigate();
+
     const [listing, setListing] =
         useState(null);
 
@@ -31,6 +35,9 @@ export default function ListingDetails() {
 
     const [loading, setLoading] =
         useState(true);
+
+    const [contacting, setContacting] =
+        useState(false);
 
 
     const jwt =
@@ -97,6 +104,78 @@ export default function ListingDetails() {
     }
 
 
+    async function handleContact() {
+
+        setContacting(true);
+        setMessage(null);
+
+        try {
+
+            const response =
+                await fetch(
+                    `/api/chats/listings/${listing.id}`,
+                    {
+                        method: "POST",
+                        headers: {
+                            Authorization:
+                                `Bearer ${jwt}`
+                        }
+                    }
+                );
+
+
+            const responseText =
+                await response.text();
+
+
+            if (!response.ok) {
+
+                let errorMessage =
+                    "No se ha podido abrir el chat";
+
+                try {
+
+                    const errorData =
+                        JSON.parse(responseText);
+
+                    errorMessage =
+                        errorData.message ||
+                        errorMessage;
+
+                } catch {
+
+                    if (responseText) {
+                        errorMessage =
+                            responseText;
+                    }
+                }
+
+
+                throw new Error(
+                    errorMessage
+                );
+            }
+
+
+            const chatId =
+                JSON.parse(responseText);
+
+
+            navigate(
+                `/chats/${chatId}`
+            );
+
+        } catch (error) {
+
+            setMessage(
+                error.message
+            );
+
+            setContacting(false);
+        }
+    }
+
+
     function formatDate(date) {
 
         if (!date) {
@@ -131,7 +210,7 @@ export default function ListingDetails() {
     }
 
 
-    if (message) {
+    if (!listing) {
 
         return (
 
@@ -139,9 +218,13 @@ export default function ListingDetails() {
 
                 <div className="listing-details-container">
 
-                    <Alert color="danger">
-                        {message}
-                    </Alert>
+                    {message ? (
+
+                        <Alert color="danger">
+                            {message}
+                        </Alert>
+
+                    ) : null}
 
                     <Link
                         to="/listings"
@@ -154,12 +237,6 @@ export default function ListingDetails() {
 
             </div>
         );
-    }
-
-
-    if (!listing) {
-
-        return null;
     }
 
 
@@ -198,6 +275,15 @@ export default function ListingDetails() {
                             : "demandas"
                     }
                 </Link>
+
+
+                {message ? (
+
+                    <Alert color="danger">
+                        {message}
+                    </Alert>
+
+                ) : null}
 
 
                 <div className="listing-details-card">
@@ -378,10 +464,18 @@ export default function ListingDetails() {
                         <button
                             type="button"
                             className="listing-details-contact-button"
-                            disabled
-                            title="Disponible cuando implementemos el chat"
+                            onClick={
+                                handleContact
+                            }
+                            disabled={
+                                contacting
+                            }
                         >
-                            Contactar
+                            {
+                                contacting
+                                    ? "Abriendo chat..."
+                                    : "Contactar"
+                            }
                         </button>
 
                     </div>

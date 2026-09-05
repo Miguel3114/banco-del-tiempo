@@ -251,6 +251,26 @@
 }
 
 
+.listing-card[role="button"] {
+    cursor: pointer;
+}
+
+
+.listing-card[role="button"]:focus {
+    outline: none;
+
+    border-color: #70a5f5;
+
+    box-shadow:
+        0 0 0 3px rgba(
+            70,
+            133,
+            230,
+            0.12
+        );
+}
+
+
 .listing-card-header {
     display: flex;
     align-items: center;
@@ -361,12 +381,43 @@
     overflow: hidden;
 }
 
+
 .listing-author-avatar-image {
     width: 100%;
     height: 100%;
+
     display: block;
+
     object-fit: cover;
 }
+
+
+.listing-author-link {
+    color: inherit;
+    text-decoration: none;
+}
+
+
+.listing-author-link:hover {
+    color: inherit;
+    text-decoration: none;
+}
+
+
+.listing-author-link .listing-author {
+    cursor: pointer;
+}
+
+
+.listing-author-link .listing-author span {
+    transition: color 0.2s;
+}
+
+
+.listing-author-link:hover .listing-author span {
+    color: #3478df;
+}
+
 
 .listing-contact-button {
     padding: 7px 12px;
@@ -392,6 +443,39 @@
     opacity: 0.55;
 
     cursor: not-allowed;
+}
+
+
+.listing-details-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 7px 12px;
+
+    border: 1px solid #3478df;
+    border-radius: 6px;
+
+    background-color: #3478df;
+
+    color: #ffffff;
+
+    font-size: 11px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+        background-color 0.2s,
+        border-color 0.2s;
+}
+
+
+.listing-details-link:hover {
+    background-color: #2768c9;
+    border-color: #2768c9;
+
+    color: #ffffff;
 }
 
 
@@ -426,29 +510,6 @@
 }
 
 
-.listing-author-link {
-    color: inherit;
-    text-decoration: none;
-}
-
-.listing-author-link:hover {
-    color: inherit;
-    text-decoration: none;
-}
-
-.listing-author-link .listing-author {
-    cursor: pointer;
-}
-
-.listing-author-link .listing-author span {
-    transition: color 0.2s;
-}
-
-.listing-author-link:hover .listing-author span {
-    color: #3478df;
-}
-
-
 @media (max-width: 900px) {
 
     .listings-content {
@@ -477,32 +538,5 @@
 
     .create-listing-button {
         width: 100%;
-    }
-
-    .listing-card[role="button"] {
-    cursor: pointer;
-    }
-
-
-    .listing-card[role="button"]:focus {
-    outline: none;
-
-    border-color: #70a5f5;
-
-    box-shadow:
-        0 0 0 3px rgba(
-            70,
-            133,
-            230,
-            0.12
-        );
-    }
-
-
-    .listing-details-link {
-        color: #3478df;
-        
-        font-size: 11px;
-        font-weight: 600;
     }
 }

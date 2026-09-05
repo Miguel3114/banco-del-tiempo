@@ -33,6 +33,9 @@ import ListingEdit
 import MyListings
     from "./listing/MyListings";
 
+import ChatDetails
+    from "./chat/ChatDetails";
+
 import Profile
     from "./user/profile/Profile";
 
@@ -195,6 +198,15 @@ function App() {
                     element={
                         <PrivateRoute>
                             <MyListings />
+                        </PrivateRoute>
+                    }
+                />
+
+                <Route
+                    path="/chats/:id"
+                    element={
+                        <PrivateRoute>
+                            <ChatDetails />
                         </PrivateRoute>
                     }
                 />

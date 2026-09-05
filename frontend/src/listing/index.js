@@ -42,6 +42,11 @@ export default function Listings({
     const [loading, setLoading] =
         useState(true);
 
+    const [
+        contactingListingId,
+        setContactingListingId
+    ] = useState(null);
+
 
     const navigate =
         useNavigate();
@@ -253,6 +258,114 @@ export default function Listings({
     function handleAuthorKeyDown(event) {
 
         event.stopPropagation();
+    }
+
+
+    async function handleContact(
+        event,
+        listingId
+    ) {
+
+        event.stopPropagation();
+
+        setMessage(null);
+        setContactingListingId(
+            listingId
+        );
+
+        try {
+
+            const response =
+                await fetch(
+                    `/api/chats/listings/${listingId}`,
+                    {
+                        method: "POST",
+                        headers: {
+                            Authorization:
+                                `Bearer ${jwt}`
+                        }
+                    }
+                );
+
+
+            const responseText =
+                await response.text();
+
+
+            if (!response.ok) {
+
+                let errorMessage =
+                    "No se ha podido abrir el chat";
+
+                try {
+
+                    const errorData =
+                        JSON.parse(
+                            responseText
+                        );
+
+                    errorMessage =
+                        errorData.message ||
+                        errorMessage;
+
+                } catch {
+
+                    if (responseText) {
+
+                        errorMessage =
+                            responseText;
+                    }
+                }
+
+
+                throw new Error(
+                    errorMessage
+                );
+            }
+
+
+            const chatId =
+                JSON.parse(
+                    responseText
+                );
+
+
+            navigate(
+                `/chats/${chatId}`
+            );
+
+        } catch (error) {
+
+            setMessage(
+                error.message
+            );
+
+            setContactingListingId(
+                null
+            );
+        }
+    }
+
+
+    function handleContactKeyDown(
+        event,
+        listingId
+    ) {
+
+        event.stopPropagation();
+
+        if (
+            event.key === "Enter" ||
+            event.key === " "
+        ) {
+
+            event.preventDefault();
+
+            handleContact(
+                event,
+                listingId
+            );
+        }
     }
 
 
@@ -612,8 +725,33 @@ export default function Listings({
                                                                 </Link>
 
 
-                                                                <span className="listing-details-link">
-                                                                    Contactar
+                                                                <span
+                                                                    className="listing-details-link"
+                                                                    role="button"
+                                                                    tabIndex="0"
+                                                                    onClick={
+                                                                        (event) =>
+                                                                            handleContact(
+                                                                                event,
+                                                                                listing.id
+                                                                            )
+                                                                    }
+                                                                    onKeyDown={
+                                                                        (event) =>
+                                                                            handleContactKeyDown(
+                                                                                event,
+                                                                                listing.id
+                                                                            )
+                                                                    }
+                                                                >
+
+                                                                    {
+                                                                        contactingListingId ===
+                                                                        listing.id
+                                                                            ? "Abriendo chat..."
+                                                                            : "Contactar"
+                                                                    }
+
                                                                 </span>
 
                                                             </div>
