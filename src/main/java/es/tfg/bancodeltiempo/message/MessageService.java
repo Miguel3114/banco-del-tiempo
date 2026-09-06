@@ -52,12 +52,25 @@ public class MessageService {
         User currentUser = this.userService.findCurrentUser();
 
         Message message = new Message();
-
         message.setChat(chat);
         message.setSender(currentUser);
         message.setContent(request.getContent().trim());
         message.setReadStatus(ReadStatus.UNREAD);
 
         return this.messageRepository.save(message);
+    }
+
+    @Transactional(readOnly = true)
+    public Message findLastMessage(Integer chatId) {
+        return this.messageRepository.findLast(chatId)
+                .orElse(null);
+    }
+
+    @Transactional(readOnly = true)
+    public Boolean hasUnreadMessages(Integer chatId, Integer userId) {
+        return this.messageRepository.countUnread(
+                chatId,
+                userId,
+                ReadStatus.UNREAD) > 0;
     }
 }

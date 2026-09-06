@@ -1,5 +1,6 @@
 package es.tfg.bancodeltiempo.chat;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,7 +51,6 @@ public class ChatService {
         }
 
         Chat chat = new Chat();
-
         chat.setListing(listing);
         chat.setInterestedUser(currentUser);
         chat.setAuthorStatus(ChatStatus.ACTIVE);
@@ -73,6 +73,15 @@ public class ChatService {
         this.checkChatIsActive(chat, currentUser);
 
         return chat;
+    }
+
+    @Transactional(readOnly = true)
+    public List<Chat> findMyChats() {
+        User currentUser = this.userService.findCurrentUser();
+
+        return this.chatRepository.findByUser(
+                currentUser.getId(),
+                ChatStatus.ACTIVE);
     }
 
     public void checkParticipant(Chat chat, User user) {
