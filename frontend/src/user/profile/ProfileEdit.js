@@ -61,6 +61,9 @@ export default function ProfileEdit() {
     const [saveError, setSaveError] =
         useState(null);
 
+    const [imageError, setImageError] =
+        useState(null);
+
     const [loading, setLoading] =
         useState(true);
 
@@ -81,7 +84,9 @@ export default function ProfileEdit() {
         useMemo(
             () =>
                 user
-                    ? getProfileEditForm(user)
+                    ? getProfileEditForm(
+                        user
+                    )
                     : [],
             [user]
         );
@@ -96,63 +101,79 @@ export default function ProfileEdit() {
                 const [
                     userResponse,
                     skillsResponse
-                ] = await Promise.all([
+                ] =
+                    await Promise.all([
 
-                    fetch(
-                        "/api/users/me",
-                        {
-                            headers: {
-                                Authorization:
-                                    `Bearer ${jwt}`
+                        fetch(
+                            "/api/users/me",
+                            {
+                                headers: {
+                                    Authorization:
+                                        `Bearer ${jwt}`
+                                }
                             }
-                        }
-                    ),
+                        ),
 
-                    fetch(
-                        "/api/skills",
-                        {
-                            headers: {
-                                Authorization:
-                                    `Bearer ${jwt}`
+                        fetch(
+                            "/api/skills",
+                            {
+                                headers: {
+                                    Authorization:
+                                        `Bearer ${jwt}`
+                                }
                             }
-                        }
-                    )
-                ]);
+                        )
+                    ]);
 
 
                 const userData =
-                    await userResponse.json();
+                    await getResponseData(
+                        userResponse
+                    );
 
                 const skillsData =
-                    await skillsResponse.json();
+                    await getResponseData(
+                        skillsResponse
+                    );
 
 
-                if (!userResponse.ok) {
+                if (
+                    !userResponse.ok
+                ) {
 
                     throw new Error(
-                        userData.message ||
+                        userData?.message ||
+                        userData ||
                         "No se ha podido cargar el perfil"
                     );
                 }
 
 
-                if (!skillsResponse.ok) {
+                if (
+                    !skillsResponse.ok
+                ) {
 
                     throw new Error(
-                        skillsData.message ||
+                        skillsData?.message ||
+                        skillsData ||
                         "No se han podido cargar las habilidades"
                     );
                 }
 
 
-                setUser(userData);
+                setUser(
+                    userData
+                );
 
-                setSkills(skillsData);
+                setSkills(
+                    skillsData
+                );
 
                 setSelectedSkillIds(
                     userData.skills
                         ? userData.skills.map(
-                            (skill) => skill.id
+                            (skill) =>
+                                skill.id
                         )
                         : []
                 );
@@ -166,7 +187,9 @@ export default function ProfileEdit() {
 
             } finally {
 
-                setLoading(false);
+                setLoading(
+                    false
+                );
             }
         }
 
@@ -182,9 +205,10 @@ export default function ProfileEdit() {
 
             if (
                 profileImagePreview &&
-                profileImagePreview.startsWith(
-                    "blob:"
-                )
+                profileImagePreview
+                    .startsWith(
+                        "blob:"
+                    )
             ) {
 
                 URL.revokeObjectURL(
@@ -196,7 +220,9 @@ export default function ProfileEdit() {
     }, [profileImagePreview]);
 
 
-    function toggleSkill(skillId) {
+    function toggleSkill(
+        skillId
+    ) {
 
         if (
             selectedSkillIds.includes(
@@ -221,10 +247,13 @@ export default function ProfileEdit() {
     }
 
 
-    function handleProfileImage(event) {
+    function handleProfileImage(
+        event
+    ) {
 
         const file =
             event.target.files[0];
+
 
         if (!file) {
             return;
@@ -243,11 +272,12 @@ export default function ProfileEdit() {
             )
         ) {
 
-            setMessage(
+            setImageError(
                 "La foto debe estar en formato JPG o PNG"
             );
 
-            event.target.value = "";
+            event.target.value =
+                "";
 
             return;
         }
@@ -258,11 +288,12 @@ export default function ProfileEdit() {
             5 * 1024 * 1024
         ) {
 
-            setMessage(
+            setImageError(
                 "La foto no puede superar los 5 MB"
             );
 
-            event.target.value = "";
+            event.target.value =
+                "";
 
             return;
         }
@@ -270,9 +301,10 @@ export default function ProfileEdit() {
 
         if (
             profileImagePreview &&
-            profileImagePreview.startsWith(
-                "blob:"
-            )
+            profileImagePreview
+                .startsWith(
+                    "blob:"
+                )
         ) {
 
             URL.revokeObjectURL(
@@ -281,13 +313,26 @@ export default function ProfileEdit() {
         }
 
 
-        setMessage(null);
-        setSaveError(null);
-        setProfileImage(file);
-        setRemoveProfileImage(false);
+        setImageError(
+            null
+        );
+
+        setSaveError(
+            null
+        );
+
+        setProfileImage(
+            file
+        );
+
+        setRemoveProfileImage(
+            false
+        );
 
         setProfileImagePreview(
-            URL.createObjectURL(file)
+            URL.createObjectURL(
+                file
+            )
         );
     }
 
@@ -296,9 +341,10 @@ export default function ProfileEdit() {
 
         if (
             profileImagePreview &&
-            profileImagePreview.startsWith(
-                "blob:"
-            )
+            profileImagePreview
+                .startsWith(
+                    "blob:"
+                )
         ) {
 
             URL.revokeObjectURL(
@@ -307,8 +353,13 @@ export default function ProfileEdit() {
         }
 
 
-        setProfileImage(null);
-        setProfileImagePreview(null);
+        setProfileImage(
+            null
+        );
+
+        setProfileImagePreview(
+            null
+        );
 
         setRemoveProfileImage(
             Boolean(
@@ -316,13 +367,22 @@ export default function ProfileEdit() {
             )
         );
 
-        setMessage(null);
-        setSaveError(null);
+        setImageError(
+            null
+        );
+
+        setSaveError(
+            null
+        );
 
 
-        if (imageInputRef.current) {
+        if (
+            imageInputRef.current
+        ) {
 
-            imageInputRef.current.value =
+            imageInputRef
+                .current
+                .value =
                 "";
         }
     }
@@ -332,6 +392,7 @@ export default function ProfileEdit() {
 
         const formData =
             new FormData();
+
 
         formData.append(
             "file",
@@ -343,31 +404,39 @@ export default function ProfileEdit() {
             await fetch(
                 "/api/users/me/profile-image",
                 {
-                    method: "POST",
+                    method:
+                        "POST",
 
                     headers: {
                         Authorization:
                             `Bearer ${jwt}`
                     },
 
-                    body: formData
+                    body:
+                        formData
                 }
             );
 
 
-        if (!response.ok) {
+        const data =
+            await getResponseData(
+                response
+            );
 
-            const error =
-                await response.text();
+
+        if (
+            !response.ok
+        ) {
 
             throw new Error(
-                error ||
+                data?.message ||
+                data ||
                 "No se ha podido guardar la foto de perfil"
             );
         }
 
 
-        return response.json();
+        return data;
     }
 
 
@@ -377,7 +446,8 @@ export default function ProfileEdit() {
             await fetch(
                 "/api/users/me/profile-image",
                 {
-                    method: "DELETE",
+                    method:
+                        "DELETE",
 
                     headers: {
                         Authorization:
@@ -387,29 +457,38 @@ export default function ProfileEdit() {
             );
 
 
-        if (!response.ok) {
+        const data =
+            await getResponseData(
+                response
+            );
 
-            const error =
-                await response.text();
+
+        if (
+            !response.ok
+        ) {
 
             throw new Error(
-                error ||
+                data?.message ||
+                data ||
                 "No se ha podido eliminar la foto de perfil"
             );
         }
 
 
-        return response.json();
+        return data;
     }
 
 
-    async function updateProfile(request) {
+    async function updateProfile(
+        request
+    ) {
 
         const response =
             await fetch(
                 "/api/users/me",
                 {
-                    method: "PUT",
+                    method:
+                        "PUT",
 
                     headers: {
                         "Content-Type":
@@ -428,15 +507,28 @@ export default function ProfileEdit() {
 
 
         const data =
-            await response.json();
-
-
-        if (!response.ok) {
-
-            throw new Error(
-                data.message ||
-                "No se ha podido actualizar el perfil"
+            await getResponseData(
+                response
             );
+
+
+        if (
+            !response.ok
+        ) {
+
+            const error =
+                new Error(
+                    data?.message ||
+                    data ||
+                    "No se ha podido actualizar el perfil"
+                );
+
+
+            error.status =
+                response.status;
+
+
+            throw error;
         }
 
 
@@ -449,16 +541,25 @@ export default function ProfileEdit() {
     }) {
 
         if (
-            !profileFormRef.current
+            !profileFormRef
+                .current
                 .validate()
         ) {
             return;
         }
 
 
-        setMessage(null);
-        setSaveError(null);
-        setSaving(true);
+        setMessage(
+            null
+        );
+
+        setSaveError(
+            null
+        );
+
+        setSaving(
+            true
+        );
 
 
         const newEmail =
@@ -472,28 +573,34 @@ export default function ProfileEdit() {
                 .toLowerCase();
 
         const emailChanged =
-            newEmail !== currentEmail;
+            newEmail !==
+            currentEmail;
 
 
         const request = {
 
             firstName:
-                values.firstName.trim(),
+                values.firstName
+                    .trim(),
 
             lastName:
-                values.lastName.trim(),
+                values.lastName
+                    .trim(),
 
             email:
                 newEmail,
 
             biography:
-                values.biography.trim(),
+                values.biography
+                    .trim(),
 
             skillIds:
                 selectedSkillIds,
 
             password:
-                values.password.length > 0
+                values.password
+                    .trim()
+                    .length > 0
                     ? values.password
                     : null
         };
@@ -501,9 +608,13 @@ export default function ProfileEdit() {
 
         try {
 
-            if (emailChanged) {
+            if (
+                emailChanged
+            ) {
 
-                if (profileImage) {
+                if (
+                    profileImage
+                ) {
 
                     await uploadProfileImage();
 
@@ -521,9 +632,13 @@ export default function ProfileEdit() {
             );
 
 
-            if (!emailChanged) {
+            if (
+                !emailChanged
+            ) {
 
-                if (profileImage) {
+                if (
+                    profileImage
+                ) {
 
                     await uploadProfileImage();
 
@@ -536,9 +651,13 @@ export default function ProfileEdit() {
             }
 
 
-            if (emailChanged) {
+            if (
+                emailChanged
+            ) {
 
-                tokenService.removeUser();
+                tokenService
+                    .removeUser();
+
 
                 window.location.href =
                     "/login";
@@ -553,11 +672,32 @@ export default function ProfileEdit() {
 
         } catch (error) {
 
-            setSaveError(
-                error.message
-            );
+            if (
+                error.status ===
+                409
+            ) {
 
-            setSaving(false);
+                profileFormRef
+                    .current
+                    .setFieldErrors(
+                        "email",
+                        [
+                            error.message ||
+                            "El correo electrónico ya está registrado"
+                        ]
+                    );
+
+            } else {
+
+                setSaveError(
+                    error.message
+                );
+            }
+
+
+            setSaving(
+                false
+            );
         }
     }
 
@@ -596,6 +736,7 @@ export default function ProfileEdit() {
 
                     </Alert>
 
+
                     <Link
                         to="/profile"
                         className="profile-edit-cancel"
@@ -617,13 +758,17 @@ export default function ProfileEdit() {
             <div className="profile-edit-card">
 
 
-                {message ? (
+                {
+                    message
+                        ? (
 
-                    <Alert color="danger">
-                        {message}
-                    </Alert>
+                            <Alert color="danger">
+                                {message}
+                            </Alert>
 
-                ) : null}
+                        )
+                        : null
+                }
 
 
                 <div className="profile-edit-header">
@@ -678,13 +823,17 @@ export default function ProfileEdit() {
 
                                             {
                                                 user.firstName
-                                                    .charAt(0)
+                                                    .charAt(
+                                                        0
+                                                    )
                                                     .toUpperCase()
                                             }
 
                                             {
                                                 user.lastName
-                                                    .charAt(0)
+                                                    .charAt(
+                                                        0
+                                                    )
                                                     .toUpperCase()
                                             }
 
@@ -713,9 +862,7 @@ export default function ProfileEdit() {
                         htmlFor="profileImage"
                         className="profile-edit-image-button"
                     >
-
                         Cambiar foto
-
                     </label>
 
 
@@ -756,6 +903,19 @@ export default function ProfileEdit() {
 
                     </span>
 
+
+                    {
+                        imageError
+                            ? (
+
+                                <span className="class-error-message">
+                                    {imageError}
+                                </span>
+
+                            )
+                            : null
+                    }
+
                 </div>
 
 
@@ -771,7 +931,9 @@ export default function ProfileEdit() {
                         onSubmit={
                             handleSubmit
                         }
-                        numberOfColumns={1}
+                        numberOfColumns={
+                            1
+                        }
                         buttonText={
                             saving
                                 ? "Guardando..."
@@ -780,7 +942,9 @@ export default function ProfileEdit() {
                         buttonClassName={
                             "profile-edit-submit-button"
                         }
-                        childrenPosition={-1}
+                        childrenPosition={
+                            -1
+                        }
                     >
 
                         <>
@@ -803,12 +967,16 @@ export default function ProfileEdit() {
 
                                     {
                                         skills.map(
-                                            (skill) => {
+                                            (
+                                                skill
+                                            ) => {
 
                                                 const selected =
-                                                    selectedSkillIds.includes(
-                                                        skill.id
-                                                    );
+                                                    selectedSkillIds
+                                                        .includes(
+                                                            skill.id
+                                                        );
+
 
                                                 return (
 
@@ -860,16 +1028,20 @@ export default function ProfileEdit() {
                             </div>
 
 
-                            {saveError ? (
+                            {
+                                saveError
+                                    ? (
 
-                                <Alert
-                                    color="danger"
-                                    className="profile-edit-save-error"
-                                >
-                                    {saveError}
-                                </Alert>
+                                        <Alert
+                                            color="danger"
+                                            className="profile-edit-save-error"
+                                        >
+                                            {saveError}
+                                        </Alert>
 
-                            ) : null}
+                                    )
+                                    : null
+                            }
 
                         </>
 
@@ -889,4 +1061,30 @@ export default function ProfileEdit() {
 
         </div>
     );
+}
+
+
+async function getResponseData(
+    response
+) {
+
+    const text =
+        await response.text();
+
+
+    if (!text) {
+        return null;
+    }
+
+
+    try {
+
+        return JSON.parse(
+            text
+        );
+
+    } catch {
+
+        return text;
+    }
 }

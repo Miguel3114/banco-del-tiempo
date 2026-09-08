@@ -3,6 +3,7 @@ package es.tfg.bancodeltiempo.chat;
 import java.time.LocalDateTime;
 
 import es.tfg.bancodeltiempo.listing.ListingType;
+import es.tfg.bancodeltiempo.message.Message;
 import es.tfg.bancodeltiempo.user.User;
 import lombok.Getter;
 
@@ -18,6 +19,10 @@ public class ChatDTO {
     private String otherUserLastName;
     private String otherUserProfileImageUrl;
     private LocalDateTime openedAt;
+    private String lastMessage;
+    private LocalDateTime lastMessageAt;
+    private LocalDateTime lastActivityAt;
+    private Boolean unread;
 
     public ChatDTO(Chat chat, User currentUser) {
         User otherUser = chat.getListing().getAuthor().getId().equals(currentUser.getId())
@@ -33,5 +38,14 @@ public class ChatDTO {
         this.otherUserLastName = otherUser.getLastName();
         this.otherUserProfileImageUrl = otherUser.getProfileImageUrl();
         this.openedAt = chat.getOpenedAt();
+    }
+
+    public ChatDTO(Chat chat, User currentUser, Message lastMessage, Boolean unread) {
+        this(chat, currentUser);
+
+        this.lastMessage = lastMessage != null ? lastMessage.getContent() : null;
+        this.lastMessageAt = lastMessage != null ? lastMessage.getSentAt() : null;
+        this.lastActivityAt = lastMessage != null ? lastMessage.getSentAt() : chat.getOpenedAt();
+        this.unread = unread;
     }
 }

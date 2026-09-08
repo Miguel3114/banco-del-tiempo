@@ -1,5 +1,6 @@
 package es.tfg.bancodeltiempo.chat;
 
+import java.util.Comparator;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +33,30 @@ public class ChatRestController {
         this.chatService = chatService;
         this.messageService = messageService;
         this.userService = userService;
+    }
+
+    @GetMapping
+    public ResponseEntity<List<ChatDTO>> findChats() {
+        User currentUser = this.userService.findCurrentUser();
+
+        List<ChatDTO> chats = this.chatService.findMyChats()
+                .stream()
+                .map(chat -> {
+                    Message lastMessage = this.messageService.findLastMessage(chat.getId());
+                    Boolean unread = this.messageService.hasUnreadMessages(
+                            chat.getId(),
+                            currentUser.getId());
+
+                    return new ChatDTO(
+                            chat,
+                            currentUser,
+                            lastMessage,
+                            unread);
+                })
+                .sorted(Comparator.comparing(ChatDTO::getLastActivityAt).reversed())
+                .toList();
+
+        return ResponseEntity.ok(chats);
     }
 
     @PostMapping("/listings/{listingId}")

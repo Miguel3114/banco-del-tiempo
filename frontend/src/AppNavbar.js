@@ -41,124 +41,193 @@ function AppNavbar() {
     const [user, setUser] =
         useState(null);
 
+    const [hasUnread, setHasUnread] =
+        useState(false);
+
     const [collapsed, setCollapsed] =
         useState(true);
-
 
     const jwt =
         tokenService.getLocalAccessToken();
 
-    const storedUser =
-        tokenService.getUser();
 
+    function toggleNavbar() {
 
-    const toggleNavbar =
-        () => setCollapsed(!collapsed);
+        setCollapsed(
+            !collapsed
+        );
+    }
 
 
     useEffect(() => {
 
         if (!jwt) {
+
+            setRoles([]);
+            setUser(null);
+            setHasUnread(false);
+
             return;
         }
 
-        const decodedToken =
-            jwt_decode(jwt);
 
         setRoles(
-            decodedToken.authorities
+            jwt_decode(jwt).authorities
         );
 
 
-        fetch(
-            "/api/users/me",
-            {
-                headers: {
-                    Authorization:
-                        `Bearer ${jwt}`
-                }
-            }
-        )
-            .then((response) => {
+        loadCurrentUser();
+        loadUnreadChats();
 
-                if (!response.ok) {
-                    throw new Error();
-                }
 
-                return response.json();
-            })
+        const interval =
+            setInterval(
+                () => {
 
-            .then((data) => {
+                    loadUnreadChats();
 
-                setUser(data);
-            })
+                },
+                3000
+            );
 
-            .catch(() => {
 
-                setUser(null);
-            });
+        return () => {
+
+            clearInterval(
+                interval
+            );
+        };
 
     }, [jwt]);
 
 
-    function getUserInitials() {
+    async function loadCurrentUser() {
 
-        if (
-            user?.firstName &&
-            user?.lastName
-        ) {
+        try {
 
-            return (
-                user.firstName
-                    .charAt(0)
-                    .toUpperCase()
-                +
-                user.lastName
-                    .charAt(0)
-                    .toUpperCase()
+            const response =
+                await fetch(
+                    "/api/users/me",
+                    {
+                        headers: {
+                            Authorization:
+                                `Bearer ${jwt}`
+                        }
+                    }
+                );
+
+
+            if (!response.ok) {
+                return;
+            }
+
+
+            const data =
+                await response.json();
+
+
+            setUser(
+                data
             );
+
+        } catch {
         }
-
-
-        if (user?.firstName) {
-
-            return user.firstName
-                .charAt(0)
-                .toUpperCase();
-        }
-
-
-        if (storedUser?.email) {
-
-            return storedUser.email
-                .charAt(0)
-                .toUpperCase();
-        }
-
-
-        return "?";
     }
 
 
-    let publicLinks = <></>;
+    async function loadUnreadChats() {
 
-    let userLinks = <></>;
+        try {
 
-    let userMenu = <></>;
+            const response =
+                await fetch(
+                    "/api/chats",
+                    {
+                        headers: {
+                            Authorization:
+                                `Bearer ${jwt}`
+                        }
+                    }
+                );
 
-    let adminLinks = <></>;
+
+            if (!response.ok) {
+                return;
+            }
 
 
-    roles.forEach((role) => {
+            const data =
+                await response.json();
 
-        if (role === "ADMIN") {
 
-            adminLinks = (
-                <>
-                </>
+            if (!Array.isArray(data)) {
+
+                setHasUnread(false);
+
+                return;
+            }
+
+
+            setHasUnread(
+                data.some(
+                    (chat) =>
+                        chat.unread === true
+                )
             );
+
+        } catch {
         }
-    });
+    }
+
+
+    function getInitials() {
+
+        if (!user) {
+            return "?";
+        }
+
+
+        const firstName =
+            user.firstName || "";
+
+        const lastName =
+            user.lastName || "";
+
+
+        return (
+            firstName.charAt(0) +
+            lastName.charAt(0)
+        ).toUpperCase();
+    }
+
+
+    let publicLinks =
+        <></>;
+
+    let userLinks =
+        <></>;
+
+    let userMenu =
+        <></>;
+
+    let adminLinks =
+        <></>;
+
+
+    roles.forEach(
+        (role) => {
+
+            if (
+                role === "ADMIN"
+            ) {
+
+                adminLinks = (
+                    <>
+                    </>
+                );
+            }
+        }
+    );
 
 
     if (!jwt) {
@@ -204,7 +273,7 @@ function AppNavbar() {
                     <NavLink
                         tag={Link}
                         to="/listings"
-                        className="main-navbar-link"
+                        className="app-navbar-main-link"
                     >
                         Ofertas
                     </NavLink>
@@ -217,9 +286,40 @@ function AppNavbar() {
                     <NavLink
                         tag={Link}
                         to="/requests"
-                        className="main-navbar-link"
+                        className="app-navbar-main-link"
                     >
                         Demandas
+                    </NavLink>
+
+                </NavItem>
+
+
+                <NavItem>
+
+                    <NavLink
+                        tag={Link}
+                        to="/chats"
+                        className="app-navbar-main-link app-navbar-mailbox-link"
+                    >
+
+                        <span>
+                            Buzón
+                        </span>
+
+
+                        {
+                            hasUnread
+                                ? (
+
+                                    <span
+                                        className="app-navbar-unread-dot"
+                                        title="Tienes mensajes sin leer"
+                                    />
+
+                                )
+                                : null
+                        }
+
                     </NavLink>
 
                 </NavItem>
@@ -229,60 +329,55 @@ function AppNavbar() {
 
 
         userMenu = (
-
             <UncontrolledDropdown
                 nav
                 inNavbar
-                className="user-dropdown"
             >
 
                 <DropdownToggle
                     nav
-                    className="user-avatar-toggle"
+                    caret
+                    className="app-navbar-user-toggle"
                 >
 
-                    {
-                        user?.profileImageUrl
-                            ? (
+                    <div className="app-navbar-avatar">
 
-                                <img
-                                    src={
-                                        user.profileImageUrl
-                                    }
-                                    alt="Perfil"
-                                    className="navbar-user-avatar"
-                                />
+                        {
+                            user?.profileImageUrl
+                                ? (
 
-                            )
-                            : (
+                                    <img
+                                        src={
+                                            user.profileImageUrl
+                                        }
+                                        alt="Foto de perfil"
+                                        className="app-navbar-avatar-image"
+                                    />
 
-                                <div className="navbar-user-avatar-placeholder">
+                                )
+                                : (
 
-                                    {
-                                        getUserInitials()
-                                    }
+                                    <span>
+                                        {
+                                            getInitials()
+                                        }
+                                    </span>
+                                )
+                        }
 
-                                </div>
-                            )
-                    }
-
-
-                    <span className="navbar-avatar-chevron">
-                        ▾
-                    </span>
+                    </div>
 
                 </DropdownToggle>
 
 
                 <DropdownMenu
                     end
-                    className="user-dropdown-menu"
+                    className="app-navbar-dropdown"
                 >
 
                     <DropdownItem
                         tag={Link}
                         to="/profile"
-                        className="user-dropdown-item"
                     >
                         Mi perfil
                     </DropdownItem>
@@ -291,15 +386,14 @@ function AppNavbar() {
                     <DropdownItem
                         tag={Link}
                         to="/mylistings"
-                        className="user-dropdown-item"
                     >
                         Mis anuncios
                     </DropdownItem>
 
 
                     <DropdownItem
-                        disabled
-                        className="user-dropdown-item"
+                        tag={Link}
+                        to="/exchanges"
                     >
                         Mis intercambios
                     </DropdownItem>
@@ -311,7 +405,6 @@ function AppNavbar() {
                     <DropdownItem
                         tag={Link}
                         to="/logout"
-                        className="user-dropdown-item user-dropdown-logout"
                     >
                         Cerrar sesión
                     </DropdownItem>
@@ -332,12 +425,15 @@ function AppNavbar() {
         >
 
             <NavbarBrand
-                href="/"
+                tag={Link}
+                to="/"
                 className="app-navbar-brand"
             >
 
                 <img
-                    src={reloj_logo}
+                    src={
+                        reloj_logo
+                    }
                     alt="Banco del Tiempo"
                     className="app-navbar-logo"
                 />
@@ -350,47 +446,39 @@ function AppNavbar() {
 
 
             <NavbarToggler
-                onClick={toggleNavbar}
+                onClick={
+                    toggleNavbar
+                }
             />
 
 
             <Collapse
-                isOpen={!collapsed}
+                isOpen={
+                    !collapsed
+                }
                 navbar
-                className="app-navbar-collapse"
             >
 
-                {
-                    jwt
-                        ? (
-
-                            <Nav
-                                className="navbar-center-links"
-                                navbar
-                            >
-
-                                {userLinks}
-
-                            </Nav>
-
-                        )
-                        : null
-                }
-
-
                 <Nav
-                    className="navbar-right-links"
+                    className="app-navbar-center"
                     navbar
                 >
 
-                    {publicLinks}
-
-                    {userMenu}
+                    {userLinks}
+                    {adminLinks}
 
                 </Nav>
 
 
-                {adminLinks}
+                <Nav
+                    className="ms-auto app-navbar-right"
+                    navbar
+                >
+
+                    {publicLinks}
+                    {userMenu}
+
+                </Nav>
 
             </Collapse>
 

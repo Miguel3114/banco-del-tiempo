@@ -49,34 +49,63 @@ export default function Register() {
     const [message, setMessage] =
         useState(null);
 
+    const [imageError, setImageError] =
+        useState(null);
+
     const registerFormRef =
         useRef();
 
 
     useEffect(() => {
 
-        fetch("/api/skills")
+        fetch(
+            "/api/skills"
+        )
 
-            .then((response) => {
+            .then(
+                async (
+                    response
+                ) => {
 
-                if (response.status === 200) {
-                    return response.json();
+                    const data =
+                        await getResponseData(
+                            response
+                        );
+
+
+                    if (
+                        !response.ok
+                    ) {
+
+                        throw new Error(
+                            data?.message ||
+                            data ||
+                            "No se han podido cargar las habilidades"
+                        );
+                    }
+
+
+                    return data;
                 }
+            )
 
-                return Promise.reject(
-                    "No se han podido cargar las habilidades"
-                );
-            })
+            .then(
+                (data) => {
 
-            .then((data) => {
+                    setSkills(
+                        data
+                    );
+                }
+            )
 
-                setSkills(data);
-            })
+            .catch(
+                (error) => {
 
-            .catch((error) => {
-
-                setMessage(error);
-            });
+                    setMessage(
+                        error.message
+                    );
+                }
+            );
 
     }, []);
 
@@ -85,7 +114,9 @@ export default function Register() {
 
         return () => {
 
-            if (profileImagePreview) {
+            if (
+                profileImagePreview
+            ) {
 
                 URL.revokeObjectURL(
                     profileImagePreview
@@ -96,7 +127,9 @@ export default function Register() {
     }, [profileImagePreview]);
 
 
-    function toggleSkill(skillId) {
+    function toggleSkill(
+        skillId
+    ) {
 
         if (
             selectedSkillIds.includes(
@@ -121,19 +154,24 @@ export default function Register() {
     }
 
 
-    function handleProfileImage(event) {
+    function handleProfileImage(
+        event
+    ) {
 
         const file =
             event.target.files[0];
+
 
         if (!file) {
             return;
         }
 
+
         const validTypes = [
             "image/jpeg",
             "image/png"
         ];
+
 
         if (
             !validTypes.includes(
@@ -141,195 +179,286 @@ export default function Register() {
             )
         ) {
 
-            setMessage(
+            setImageError(
                 "La foto debe estar en formato JPG o PNG"
             );
 
-            event.target.value = "";
+            event.target.value =
+                "";
 
             return;
         }
+
 
         if (
             file.size >
             5 * 1024 * 1024
         ) {
 
-            setMessage(
+            setImageError(
                 "La foto no puede superar los 5 MB"
             );
 
-            event.target.value = "";
+            event.target.value =
+                "";
 
             return;
         }
 
-        setMessage(null);
 
-        setProfileImage(file);
+        if (
+            profileImagePreview
+        ) {
+
+            URL.revokeObjectURL(
+                profileImagePreview
+            );
+        }
+
+
+        setImageError(
+            null
+        );
+
+        setProfileImage(
+            file
+        );
 
         setProfileImagePreview(
-            URL.createObjectURL(file)
+            URL.createObjectURL(
+                file
+            )
         );
     }
 
 
-    function uploadProfileImage(token) {
+    async function uploadProfileImage(
+        token
+    ) {
 
         const formData =
             new FormData();
+
 
         formData.append(
             "file",
             profileImage
         );
 
-        return fetch(
-            "/api/users/me/profile-image",
-            {
-                method: "POST",
 
-                headers: {
-                    Authorization:
-                        `Bearer ${token}`
-                },
+        const response =
+            await fetch(
+                "/api/users/me/profile-image",
+                {
+                    method:
+                        "POST",
 
-                body: formData
-            }
-        )
+                    headers: {
+                        Authorization:
+                            `Bearer ${token}`
+                    },
 
-            .then((response) => {
-
-                if (response.status === 200) {
-                    return response.json();
+                    body:
+                        formData
                 }
+            );
 
-                return response
-                    .text()
-                    .then((error) => {
 
-                        return Promise.reject(
-                            error ||
-                            "No se ha podido guardar la foto de perfil"
-                        );
-                    });
-            });
+        const data =
+            await getResponseData(
+                response
+            );
+
+
+        if (
+            !response.ok
+        ) {
+
+            throw new Error(
+                data?.message ||
+                data ||
+                "No se ha podido guardar la foto de perfil"
+            );
+        }
+
+
+        return data;
     }
 
 
-    function handleSubmit({ values }) {
+    async function handleSubmit({
+        values
+    }) {
 
         if (
-            !registerFormRef.current
+            !registerFormRef
+                .current
                 .validate()
         ) {
             return;
         }
 
-        setMessage(null);
+
+        setMessage(
+            null
+        );
+
 
         const request = {
+
             ...values,
-            skillIds: selectedSkillIds
+
+            firstName:
+                values.firstName
+                    .trim(),
+
+            lastName:
+                values.lastName
+                    .trim(),
+
+            email:
+                values.email
+                    .trim()
+                    .toLowerCase(),
+
+            biography:
+                values.biography
+                    .trim(),
+
+            skillIds:
+                selectedSkillIds
         };
 
-        fetch(
-            "/api/auth/register",
-            {
-                headers: {
-                    "Content-Type":
-                        "application/json"
-                },
 
-                method: "POST",
+        try {
 
-                body:
-                    JSON.stringify(
-                        request
-                    )
-            }
-        )
+            const response =
+                await fetch(
+                    "/api/auth/register",
+                    {
+                        headers: {
+                            "Content-Type":
+                                "application/json"
+                        },
 
-            .then((response) => {
+                        method:
+                            "POST",
 
-                return response
-                    .json()
-                    .then((data) => ({
-                        status:
-                            response.status,
-                        data: data
-                    }));
-            })
-
-            .then(
-                ({ status, data }) => {
-
-                    if (status !== 200) {
-
-                        setMessage(
-                            data.message ||
-                            "Error al registrarse"
-                        );
-
-                        return;
+                        body:
+                            JSON.stringify(
+                                request
+                            )
                     }
+                );
 
-                    tokenService.setUser(
-                        data
+
+            const data =
+                await getResponseData(
+                    response
+                );
+
+
+            if (
+                response.status ===
+                409
+            ) {
+
+                registerFormRef
+                    .current
+                    .setFieldErrors(
+                        "email",
+                        [
+                            data?.message ||
+                            data ||
+                            "El correo electrónico ya está registrado"
+                        ]
                     );
 
-                    tokenService
-                        .updateLocalAccessToken(
-                            data.token
-                        );
+                return;
+            }
 
-                    if (!profileImage) {
 
-                        window.location.href =
-                            "/listings";
+            if (
+                !response.ok
+            ) {
 
-                        return;
-                    }
+                throw new Error(
+                    data?.message ||
+                    data ||
+                    "Error al registrarse"
+                );
+            }
 
-                    uploadProfileImage(
-                        data.token
-                    )
 
-                        .then(() => {
+            tokenService.setUser(
+                data
+            );
 
-                            window.location.href =
-                                "/listings";
-                        })
 
-                        .catch((error) => {
+            tokenService
+                .updateLocalAccessToken(
+                    data.token
+                );
 
-                            setMessage(
-                                "La cuenta se ha creado correctamente, pero no se ha podido guardar la foto de perfil: " +
-                                error
-                            );
-                        });
-                }
-            )
 
-            .catch(() => {
+            if (
+                !profileImage
+            ) {
+
+                window.location.href =
+                    "/listings";
+
+                return;
+            }
+
+
+            try {
+
+                await uploadProfileImage(
+                    data.token
+                );
+
+
+                window.location.href =
+                    "/listings";
+
+            } catch (error) {
 
                 setMessage(
-                    "No se ha podido conectar con el servidor"
+                    "La cuenta se ha creado correctamente, pero no se ha podido guardar la foto de perfil: " +
+                    error.message
                 );
-            });
+            }
+
+
+        } catch (error) {
+
+            setMessage(
+                error.message ||
+                "No se ha podido conectar con el servidor"
+            );
+        }
     }
 
 
     return (
+
         <div className="register-page-container">
 
             <div className="register-card">
 
-                {message ? (
-                    <Alert color="danger">
-                        {message}
-                    </Alert>
-                ) : null}
+
+                {
+                    message
+                        ? (
+
+                            <Alert color="danger">
+                                {message}
+                            </Alert>
+
+                        )
+                        : null
+                }
 
 
                 <div className="register-header">
@@ -352,22 +481,26 @@ export default function Register() {
 
                     <div className="profile-image-circle">
 
-                        {profileImagePreview ? (
+                        {
+                            profileImagePreview
+                                ? (
 
-                            <img
-                                src={
-                                    profileImagePreview
-                                }
-                                alt="Foto de perfil"
-                                className="profile-image-preview"
-                            />
+                                    <img
+                                        src={
+                                            profileImagePreview
+                                        }
+                                        alt="Foto de perfil"
+                                        className="profile-image-preview"
+                                    />
 
-                        ) : (
+                                )
+                                : (
 
-                            <span className="profile-image-icon">
-                                📷
-                            </span>
-                        )}
+                                    <span className="profile-image-icon">
+                                        📷
+                                    </span>
+                                )
+                        }
 
                     </div>
 
@@ -399,12 +532,26 @@ export default function Register() {
 
                     <span className="profile-image-info">
 
-                        {profileImage
-                            ? profileImage.name
-                            : "JPG, PNG, Máx. 5MB."
+                        {
+                            profileImage
+                                ? profileImage.name
+                                : "JPG, PNG, Máx. 5MB."
                         }
 
                     </span>
+
+
+                    {
+                        imageError
+                            ? (
+
+                                <span className="class-error-message">
+                                    {imageError}
+                                </span>
+
+                            )
+                            : null
+                    }
 
                 </div>
 
@@ -421,13 +568,19 @@ export default function Register() {
                         onSubmit={
                             handleSubmit
                         }
-                        numberOfColumns={1}
+                        numberOfColumns={
+                            1
+                        }
                         listenEnterKey
-                        buttonText="Registrarse"
+                        buttonText={
+                            "Registrarse"
+                        }
                         buttonClassName={
                             "register-submit-button"
                         }
-                        childrenPosition={-1}
+                        childrenPosition={
+                            -1
+                        }
                     >
 
                         <div className="skills-container">
@@ -446,54 +599,63 @@ export default function Register() {
 
                             <div className="skills-list">
 
-                                {skills.map(
-                                    (skill) => {
+                                {
+                                    skills.map(
+                                        (
+                                            skill
+                                        ) => {
 
-                                        const selected =
-                                            selectedSkillIds
-                                                .includes(
-                                                    skill.id
-                                                );
+                                            const selected =
+                                                selectedSkillIds
+                                                    .includes(
+                                                        skill.id
+                                                    );
 
-                                        return (
 
-                                            <button
-                                                type="button"
-                                                key={
-                                                    skill.id
-                                                }
-                                                className={
-                                                    selected
-                                                        ? "skill-card skill-card-selected"
-                                                        : "skill-card"
-                                                }
-                                                onClick={
-                                                    () =>
-                                                        toggleSkill(
-                                                            skill.id
-                                                        )
-                                                }
-                                            >
+                                            return (
 
-                                                <span>
-                                                    {
-                                                        skill.name
+                                                <button
+                                                    type="button"
+                                                    key={
+                                                        skill.id
                                                     }
-                                                </span>
+                                                    className={
+                                                        selected
+                                                            ? "skill-card skill-card-selected"
+                                                            : "skill-card"
+                                                    }
+                                                    onClick={
+                                                        () =>
+                                                            toggleSkill(
+                                                                skill.id
+                                                            )
+                                                    }
+                                                >
 
-
-                                                {selected ? (
-
-                                                    <span className="skill-check">
-                                                        ✓
+                                                    <span>
+                                                        {
+                                                            skill.name
+                                                        }
                                                     </span>
 
-                                                ) : null}
 
-                                            </button>
-                                        );
-                                    }
-                                )}
+                                                    {
+                                                        selected
+                                                            ? (
+
+                                                                <span className="skill-check">
+                                                                    ✓
+                                                                </span>
+
+                                                            )
+                                                            : null
+                                                    }
+
+                                                </button>
+                                            );
+                                        }
+                                    )
+                                }
 
                             </div>
 
@@ -518,4 +680,30 @@ export default function Register() {
 
         </div>
     );
+}
+
+
+async function getResponseData(
+    response
+) {
+
+    const text =
+        await response.text();
+
+
+    if (!text) {
+        return null;
+    }
+
+
+    try {
+
+        return JSON.parse(
+            text
+        );
+
+    } catch {
+
+        return text;
+    }
 }
