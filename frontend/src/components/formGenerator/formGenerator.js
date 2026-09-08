@@ -8,168 +8,378 @@ import {
     useState
 } from "react";
 
-import FormInput from "./formInput";
+import FormInput
+    from "./formInput";
 
-const FormGenerator = forwardRef((props, ref) => {
 
-    const [formValues, setFormValues] = useState({});
-    const [submitForm, setSubmitForm] = useState(false);
+const FormGenerator =
+    forwardRef((props, ref) => {
 
-    let formInputs = useRef([]);
+        const [
+            formValues,
+            setFormValues
+        ] = useState({});
 
-    useImperativeHandle(ref, () => {
+        const [
+            submitForm,
+            setSubmitForm
+        ] = useState(false);
 
-        return {
+        const formInputs =
+            useRef([]);
 
-            validate: () => {
 
-                let isValid = true;
+        useImperativeHandle(
+            ref,
+            () => {
 
-                for (
-                    let i = 0;
-                    i < props.inputs.length;
-                    i++
-                ) {
+                return {
 
-                    let input = props.inputs[i];
+                    validate: () => {
 
-                    for (let validator of input.validators) {
+                        let isValid =
+                            true;
 
-                        if (
-                            !validator.validate(
-                                formValues[input.name]
-                            )
+
+                        for (
+                            let i = 0;
+                            i < props.inputs.length;
+                            i++
                         ) {
 
-                            formInputs.current[i]
-                                .setErrors([
-                                    validator.message
-                                ]);
+                            const input =
+                                props.inputs[i];
 
-                            isValid = false;
+                            const errors =
+                                [];
+
+
+                            for (
+                                const validator
+                                of input.validators
+                            ) {
+
+                                if (
+                                    !validator.validate(
+                                        formValues[
+                                            input.name
+                                        ]
+                                    )
+                                ) {
+
+                                    errors.push(
+                                        validator.message
+                                    );
+
+                                    isValid =
+                                        false;
+                                }
+                            }
+
+
+                            formInputs
+                                .current[i]
+                                ?.setErrors(
+                                    errors
+                                );
+                        }
+
+
+                        return isValid;
+                    },
+
+
+                    setFieldErrors: (
+                        fieldName,
+                        errors
+                    ) => {
+
+                        const index =
+                            props.inputs
+                                .findIndex(
+                                    (input) =>
+                                        input.name ===
+                                        fieldName
+                                );
+
+
+                        if (
+                            index !== -1 &&
+                            formInputs
+                                .current[index]
+                        ) {
+
+                            formInputs
+                                .current[index]
+                                .setErrors(
+                                    errors
+                                );
+                        }
+                    },
+
+
+                    clearFieldErrors: (
+                        fieldName
+                    ) => {
+
+                        const index =
+                            props.inputs
+                                .findIndex(
+                                    (input) =>
+                                        input.name ===
+                                        fieldName
+                                );
+
+
+                        if (
+                            index !== -1 &&
+                            formInputs
+                                .current[index]
+                        ) {
+
+                            formInputs
+                                .current[index]
+                                .setErrors(
+                                    []
+                                );
                         }
                     }
-                }
-
-                return isValid;
+                };
             }
-        };
-    });
+        );
 
-    function handleSubmit(e) {
 
-        e.preventDefault();
-
-        let formValuesCopy = {};
-
-        for (
-            let i = 0;
-            i < props.inputs.length;
-            i++
+        function handleSubmit(
+            event
         ) {
 
-            let input = props.inputs[i];
+            event.preventDefault();
 
-            formValuesCopy[input.name] =
-                formInputs.current[i].value;
-        }
+            const formValuesCopy =
+                {};
 
-        setFormValues(formValuesCopy);
-        setSubmitForm(true);
-    }
 
-    useEffect(() => {
+            for (
+                let i = 0;
+                i < props.inputs.length;
+                i++
+            ) {
 
-        if (Object.keys(formValues).length === 0) {
+                const input =
+                    props.inputs[i];
 
-            let newFormValues = {};
 
-            for (let input of props.inputs) {
-
-                newFormValues[input.name] =
-                    input.defaultValue
-                        ? input.defaultValue
-                        : "";
+                formValuesCopy[
+                    input.name
+                ] =
+                    formInputs
+                        .current[i]
+                        .value;
             }
 
-            setFormValues(newFormValues);
+
+            setFormValues(
+                formValuesCopy
+            );
+
+            setSubmitForm(
+                true
+            );
         }
 
-    }, [formValues, props.inputs]);
 
-    useEffect(() => {
+        useEffect(() => {
 
-        if (submitForm) {
+            if (
+                Object.keys(
+                    formValues
+                ).length === 0
+            ) {
 
-            props.onSubmit({
-                values: formValues
-            });
+                const newFormValues =
+                    {};
 
-            setSubmitForm(false);
-        }
 
-    }, [submitForm, formValues, props]);
+                for (
+                    const input
+                    of props.inputs
+                ) {
 
-    return (
-        <div className="class-profile-form">
-
-            <form className="class-form">
-
-                {Object.keys(formValues).length > 0 &&
-                    props.inputs.map(
-                        (input, index) => {
-
-                            return (
-                                <div key={input.name}>
-
-                                    {props.childrenPosition !== -1 &&
-                                        index ===
-                                            props.childrenPosition &&
-                                        props.children}
-
-                                    <FormInput
-                                        key={index}
-                                        tag={input.tag}
-                                        name={input.name}
-                                        type={input.type}
-                                        values={input.values}
-                                        defaultValue={input.defaultValue}
-                                        isRequired={input.isRequired}
-                                        minValue={input.min}
-                                        maxValue={input.max}
-                                        numberOfColumns={props.numberOfColumns}
-                                        validators={input.validators}
-                                        formValues={formValues}
-                                        setFormValues={setFormValues}
-                                        onChange={input?.onChange}
-                                        disabled={input.disabled}
-                                        placeholder={input.placeholder}
-                                        maxLength={input.maxLength}
-                                        ref={(input) =>
-                                            (formInputs.current[index] = input)
-                                        }
-                                    />
-                                </div>
-                            );
-                        }
-                    )
+                    newFormValues[
+                        input.name
+                    ] =
+                        input.defaultValue
+                            ? input.defaultValue
+                            : "";
                 }
 
-                {props.childrenPosition === -1 &&
-                    props.children}
 
-            </form>
+                setFormValues(
+                    newFormValues
+                );
+            }
 
-            <button
-                onClick={handleSubmit}
-                className={props.buttonClassName}
-            >
-                {props.buttonText}
-            </button>
+        }, [
+            formValues,
+            props.inputs
+        ]);
 
-        </div>
-    );
-});
+
+        useEffect(() => {
+
+            if (submitForm) {
+
+                props.onSubmit({
+                    values:
+                        formValues
+                });
+
+                setSubmitForm(
+                    false
+                );
+            }
+
+        }, [
+            submitForm,
+            formValues,
+            props
+        ]);
+
+
+        return (
+
+            <div className="class-profile-form">
+
+                <form className="class-form">
+
+                    {
+                        Object.keys(
+                            formValues
+                        ).length > 0 &&
+                        props.inputs.map(
+                            (
+                                input,
+                                index
+                            ) => {
+
+                                return (
+
+                                    <div
+                                        key={
+                                            input.name
+                                        }
+                                    >
+
+                                        {
+                                            props.childrenPosition !==
+                                                -1 &&
+                                            index ===
+                                                props.childrenPosition &&
+                                            props.children
+                                        }
+
+
+                                        <FormInput
+                                            key={
+                                                index
+                                            }
+                                            tag={
+                                                input.tag
+                                            }
+                                            name={
+                                                input.name
+                                            }
+                                            type={
+                                                input.type
+                                            }
+                                            values={
+                                                input.values
+                                            }
+                                            defaultValue={
+                                                input.defaultValue
+                                            }
+                                            isRequired={
+                                                input.isRequired
+                                            }
+                                            minValue={
+                                                input.min
+                                            }
+                                            maxValue={
+                                                input.max
+                                            }
+                                            numberOfColumns={
+                                                props.numberOfColumns
+                                            }
+                                            validators={
+                                                input.validators
+                                            }
+                                            formValues={
+                                                formValues
+                                            }
+                                            setFormValues={
+                                                setFormValues
+                                            }
+                                            onChange={
+                                                input?.onChange
+                                            }
+                                            disabled={
+                                                input.disabled
+                                            }
+                                            placeholder={
+                                                input.placeholder
+                                            }
+                                            maxLength={
+                                                input.maxLength
+                                            }
+                                            ref={
+                                                (
+                                                    currentInput
+                                                ) =>
+                                                    (
+                                                        formInputs
+                                                            .current[
+                                                            index
+                                                        ] =
+                                                            currentInput
+                                                    )
+                                            }
+                                        />
+
+                                    </div>
+                                );
+                            }
+                        )
+                    }
+
+
+                    {
+                        props.childrenPosition ===
+                            -1 &&
+                        props.children
+                    }
+
+                </form>
+
+
+                <button
+                    onClick={
+                        handleSubmit
+                    }
+                    className={
+                        props.buttonClassName
+                    }
+                >
+
+                    {
+                        props.buttonText
+                    }
+
+                </button>
+
+            </div>
+        );
+    });
+
 
 FormGenerator.defaultProps = {
     inputs: [],
@@ -178,5 +388,6 @@ FormGenerator.defaultProps = {
     buttonClassName: "",
     childrenPosition: -1
 };
+
 
 export default FormGenerator;

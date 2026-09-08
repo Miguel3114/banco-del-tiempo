@@ -10,6 +10,7 @@ export const registerFormMembers = [
         name: "firstName",
         type: "text",
         placeholder: "Ingresa tu nombre",
+        maxLength: 50,
         isRequired: true,
         validators: [
             formValidators.notEmptyValidator
@@ -21,6 +22,7 @@ export const registerFormMembers = [
         name: "lastName",
         type: "text",
         placeholder: "Ingresa tus apellidos",
+        maxLength: 100,
         isRequired: true,
         validators: [
             formValidators.notEmptyValidator
@@ -33,6 +35,7 @@ export const registerFormMembers = [
         type: "email",
         placeholder:
             "Ingresa tu correo electrónico",
+        maxLength: 150,
         isRequired: true,
         validators: [
             formValidators.notEmptyValidator,
@@ -46,9 +49,11 @@ export const registerFormMembers = [
         type: "password",
         placeholder:
             "Ingresa tu contraseña",
+        maxLength: 100,
         isRequired: true,
         validators: [
-            formValidators.notEmptyValidator
+            formValidators.notEmptyValidator,
+            formValidators.passwordLengthValidator
         ]
     },
 
@@ -58,7 +63,7 @@ export const registerFormMembers = [
         type: "textarea",
         placeholder:
             "Cuéntanos un poco sobre ti...",
-        maxLength: 300,
+        maxLength: 1000,
         isRequired: false,
         validators: []
     }

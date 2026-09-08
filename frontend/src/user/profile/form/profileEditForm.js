@@ -11,8 +11,10 @@ export function getProfileEditForm(user) {
             tag: "Nombre",
             name: "firstName",
             type: "text",
-            placeholder: "Introduce tu nombre",
-            defaultValue: user.firstName,
+            defaultValue:
+                user.firstName || "",
+            placeholder:
+                "Ingresa tu nombre",
             maxLength: 50,
             isRequired: true,
             validators: [
@@ -24,8 +26,10 @@ export function getProfileEditForm(user) {
             tag: "Apellidos",
             name: "lastName",
             type: "text",
-            placeholder: "Introduce tus apellidos",
-            defaultValue: user.lastName,
+            defaultValue:
+                user.lastName || "",
+            placeholder:
+                "Ingresa tus apellidos",
             maxLength: 100,
             isRequired: true,
             validators: [
@@ -37,8 +41,10 @@ export function getProfileEditForm(user) {
             tag: "Correo electrónico",
             name: "email",
             type: "email",
-            placeholder: "Introduce tu correo electrónico",
-            defaultValue: user.email,
+            defaultValue:
+                user.email || "",
+            placeholder:
+                "Ingresa tu correo electrónico",
             maxLength: 150,
             isRequired: true,
             validators: [
@@ -51,8 +57,10 @@ export function getProfileEditForm(user) {
             tag: "Biografía",
             name: "biography",
             type: "textarea",
-            placeholder: "Cuéntanos un poco sobre ti...",
-            defaultValue: user.biography || "",
+            defaultValue:
+                user.biography || "",
+            placeholder:
+                "Cuéntanos un poco sobre ti...",
             maxLength: 1000,
             isRequired: false,
             validators: []
@@ -62,12 +70,14 @@ export function getProfileEditForm(user) {
             tag: "Nueva contraseña",
             name: "password",
             type: "password",
-            placeholder: "Déjala vacía para mantener la actual",
             defaultValue: "",
+            placeholder:
+                "Déjala vacía para mantener la actual",
             maxLength: 100,
             isRequired: false,
             validators: [
-                formValidators.optionalPasswordLengthValidator
+                formValidators
+                    .optionalPasswordLengthValidator
             ]
         }
 
