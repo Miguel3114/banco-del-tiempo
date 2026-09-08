@@ -19,10 +19,18 @@ import tokenService
 import "../static/css/chat/chatDetails.css";
 
 
-export default function ChatDetails() {
+export default function ChatDetails({
+    chatId,
+    embedded = false,
+    onMessagesRead
+}) {
 
-    const { id } =
+    const params =
         useParams();
+
+    const id =
+        chatId ||
+        params.id;
 
     const [chat, setChat] =
         useState(null);
@@ -80,16 +88,21 @@ export default function ChatDetails() {
         const interval =
             setInterval(
                 () => {
+
                     loadMessages()
                         .catch(() => {
                         });
+
                 },
                 3000
             );
 
 
         return () => {
-            clearInterval(interval);
+
+            clearInterval(
+                interval
+            );
         };
 
     }, [id]);
@@ -100,26 +113,6 @@ export default function ChatDetails() {
         scrollToBottom();
 
     }, [messages]);
-
-
-    async function getResponseData(response) {
-
-        const text =
-            await response.text();
-
-        if (!text) {
-            return null;
-        }
-
-        try {
-
-            return JSON.parse(text);
-
-        } catch {
-
-            return text;
-        }
-    }
 
 
     async function loadChat() {
@@ -189,6 +182,11 @@ export default function ChatDetails() {
         setMessages(
             data || []
         );
+
+
+        if (onMessagesRead) {
+            onMessagesRead();
+        }
     }
 
 
@@ -196,8 +194,10 @@ export default function ChatDetails() {
 
         event.preventDefault();
 
+
         const trimmedContent =
             content.trim();
+
 
         if (!trimmedContent) {
             return;
@@ -220,12 +220,13 @@ export default function ChatDetails() {
                             "Content-Type":
                                 "application/json"
                         },
-                        body: JSON.stringify(
-                            {
-                                content:
-                                    trimmedContent
-                            }
-                        )
+                        body:
+                            JSON.stringify(
+                                {
+                                    content:
+                                        trimmedContent
+                                }
+                            )
                     }
                 );
 
@@ -253,7 +254,13 @@ export default function ChatDetails() {
                 ]
             );
 
+
             setContent("");
+
+
+            if (onMessagesRead) {
+                onMessagesRead();
+            }
 
         } catch (error) {
 
@@ -277,7 +284,9 @@ export default function ChatDetails() {
 
             event.preventDefault();
 
-            handleSubmit(event);
+            handleSubmit(
+                event
+            );
         }
     }
 
@@ -353,6 +362,17 @@ export default function ChatDetails() {
 
     if (loading) {
 
+        if (embedded) {
+
+            return (
+
+                <div className="chat-embedded-state">
+                    Cargando conversación...
+                </div>
+            );
+        }
+
+
         return (
 
             <div className="chat-page">
@@ -367,6 +387,25 @@ export default function ChatDetails() {
 
 
     if (!chat) {
+
+        if (embedded) {
+
+            return (
+
+                <div className="chat-embedded-state">
+
+                    {message ? (
+
+                        <Alert color="danger">
+                            {message}
+                        </Alert>
+
+                    ) : null}
+
+                </div>
+            );
+        }
+
 
         return (
 
@@ -395,278 +434,326 @@ export default function ChatDetails() {
             : `/requests/${chat.listingId}`;
 
 
+    const chatContent = (
+
+        <div
+            className={
+                embedded
+                    ? "chat-card chat-card-embedded"
+                    : "chat-card"
+            }
+        >
+
+
+            <div className="chat-header">
+
+
+                <Link
+                    to={
+                        `/users/${chat.otherUserId}`
+                    }
+                    className="chat-user-link"
+                >
+
+                    {
+                        chat.otherUserProfileImageUrl
+                            ? (
+
+                                <img
+                                    src={
+                                        chat.otherUserProfileImageUrl
+                                    }
+                                    alt={
+                                        `${chat.otherUserFirstName} ${chat.otherUserLastName}`
+                                    }
+                                    className="chat-avatar-image"
+                                />
+
+                            )
+                            : (
+
+                                <div className="chat-avatar">
+
+                                    {
+                                        getInitials()
+                                    }
+
+                                </div>
+                            )
+                    }
+
+
+                    <div className="chat-user-info">
+
+                        <h1>
+
+                            {
+                                chat.otherUserFirstName
+                            }
+
+                            {" "}
+
+                            {
+                                chat.otherUserLastName
+                            }
+
+                        </h1>
+
+                        <span>
+                            Ver perfil
+                        </span>
+
+                    </div>
+
+                </Link>
+
+
+                <Link
+                    to={
+                        listingRoute
+                    }
+                    className="chat-listing-link"
+                >
+
+                    <span className="chat-listing-label">
+                        Anuncio
+                    </span>
+
+                    <span className="chat-listing-title">
+                        {chat.listingTitle}
+                    </span>
+
+                </Link>
+
+            </div>
+
+
+            {message ? (
+
+                <Alert
+                    color="danger"
+                    className="chat-alert"
+                >
+                    {message}
+                </Alert>
+
+            ) : null}
+
+
+            <div className="chat-messages">
+
+
+                {
+                    messages.length === 0
+                        ? (
+
+                            <div className="chat-empty">
+
+                                <p>
+                                    Todavía no hay mensajes.
+                                </p>
+
+                                <span>
+                                    Escribe el primero para comenzar la conversación.
+                                </span>
+
+                            </div>
+
+                        )
+                        : (
+
+                            messages.map(
+                                (currentMessage) => {
+
+                                    if (
+                                        currentMessage.system
+                                    ) {
+
+                                        return (
+
+                                            <div
+                                                key={
+                                                    currentMessage.id
+                                                }
+                                                className="chat-system-message"
+                                            >
+
+                                                <span>
+                                                    {
+                                                        currentMessage.content
+                                                    }
+                                                </span>
+
+                                            </div>
+                                        );
+                                    }
+
+
+                                    return (
+
+                                        <div
+                                            key={
+                                                currentMessage.id
+                                            }
+                                            className={
+                                                currentMessage.mine
+                                                    ? "chat-message-row chat-message-row-mine"
+                                                    : "chat-message-row"
+                                            }
+                                        >
+
+                                            <div
+                                                className={
+                                                    currentMessage.mine
+                                                        ? "chat-message chat-message-mine"
+                                                        : "chat-message"
+                                                }
+                                            >
+
+                                                <p>
+                                                    {
+                                                        currentMessage.content
+                                                    }
+                                                </p>
+
+
+                                                <span className="chat-message-time">
+
+                                                    {
+                                                        formatTime(
+                                                            currentMessage.sentAt
+                                                        )
+                                                    }
+
+                                                </span>
+
+                                            </div>
+
+                                        </div>
+                                    );
+                                }
+                            )
+                        )
+                }
+
+
+                <div
+                    ref={
+                        messagesEndRef
+                    }
+                />
+
+            </div>
+
+
+            <form
+                className="chat-form"
+                onSubmit={
+                    handleSubmit
+                }
+            >
+
+                <textarea
+                    value={
+                        content
+                    }
+                    placeholder="Escribe un mensaje..."
+                    className="chat-input"
+                    rows="1"
+                    disabled={
+                        sending
+                    }
+                    onChange={
+                        (event) =>
+                            setContent(
+                                event.target.value
+                            )
+                    }
+                    onKeyDown={
+                        handleKeyDown
+                    }
+                />
+
+
+                <button
+                    type="submit"
+                    className="chat-send-button"
+                    disabled={
+                        sending ||
+                        !content.trim()
+                    }
+                >
+
+                    {
+                        sending
+                            ? "Enviando..."
+                            : "Enviar"
+                    }
+
+                </button>
+
+            </form>
+
+
+            <div className="chat-footer">
+
+                Conversación iniciada el{" "}
+
+                {
+                    formatDate(
+                        chat.openedAt
+                    )
+                }
+
+            </div>
+
+
+        </div>
+    );
+
+
+    if (embedded) {
+
+        return chatContent;
+    }
+
+
     return (
 
         <div className="chat-page">
 
             <div className="chat-container">
 
-
-                {message ? (
-
-                    <Alert color="danger">
-                        {message}
-                    </Alert>
-
-                ) : null}
-
-
-                <div className="chat-card">
-
-
-                    <div className="chat-header">
-
-
-                        <Link
-                            to={
-                                `/users/${chat.otherUserId}`
-                            }
-                            className="chat-user-link"
-                        >
-
-                            {
-                                chat.otherUserProfileImageUrl
-                                    ? (
-
-                                        <img
-                                            src={
-                                                chat.otherUserProfileImageUrl
-                                            }
-                                            alt={
-                                                `${chat.otherUserFirstName} ${chat.otherUserLastName}`
-                                            }
-                                            className="chat-avatar-image"
-                                        />
-
-                                    )
-                                    : (
-
-                                        <div className="chat-avatar">
-
-                                            {
-                                                getInitials()
-                                            }
-
-                                        </div>
-                                    )
-                            }
-
-
-                            <div className="chat-user-info">
-
-                                <h1>
-
-                                    {
-                                        chat.otherUserFirstName
-                                    }
-
-                                    {" "}
-
-                                    {
-                                        chat.otherUserLastName
-                                    }
-
-                                </h1>
-
-                                <span>
-                                    Ver perfil
-                                </span>
-
-                            </div>
-
-                        </Link>
-
-
-                        <Link
-                            to={listingRoute}
-                            className="chat-listing-link"
-                        >
-
-                            <span className="chat-listing-label">
-                                Anuncio
-                            </span>
-
-                            <span className="chat-listing-title">
-                                {chat.listingTitle}
-                            </span>
-
-                        </Link>
-
-                    </div>
-
-
-                    <div className="chat-messages">
-
-
-                        {
-                            messages.length === 0
-                                ? (
-
-                                    <div className="chat-empty">
-
-                                        <p>
-                                            Todavía no hay mensajes.
-                                        </p>
-
-                                        <span>
-                                            Escribe el primero para comenzar la conversación.
-                                        </span>
-
-                                    </div>
-
-                                )
-                                : (
-
-                                    messages.map(
-                                        (currentMessage) => {
-
-                                            if (
-                                                currentMessage.system
-                                            ) {
-
-                                                return (
-
-                                                    <div
-                                                        key={
-                                                            currentMessage.id
-                                                        }
-                                                        className="chat-system-message"
-                                                    >
-
-                                                        <span>
-                                                            {
-                                                                currentMessage.content
-                                                            }
-                                                        </span>
-
-                                                    </div>
-                                                );
-                                            }
-
-
-                                            return (
-
-                                                <div
-                                                    key={
-                                                        currentMessage.id
-                                                    }
-                                                    className={
-                                                        currentMessage.mine
-                                                            ? "chat-message-row chat-message-row-mine"
-                                                            : "chat-message-row"
-                                                    }
-                                                >
-
-                                                    <div
-                                                        className={
-                                                            currentMessage.mine
-                                                                ? "chat-message chat-message-mine"
-                                                                : "chat-message"
-                                                        }
-                                                    >
-
-                                                        <p>
-                                                            {
-                                                                currentMessage.content
-                                                            }
-                                                        </p>
-
-
-                                                        <span className="chat-message-time">
-
-                                                            {
-                                                                formatTime(
-                                                                    currentMessage.sentAt
-                                                                )
-                                                            }
-
-                                                        </span>
-
-                                                    </div>
-
-                                                </div>
-                                            );
-                                        }
-                                    )
-                                )
-                        }
-
-
-                        <div
-                            ref={
-                                messagesEndRef
-                            }
-                        />
-
-                    </div>
-
-
-                    <form
-                        className="chat-form"
-                        onSubmit={
-                            handleSubmit
-                        }
-                    >
-
-                        <textarea
-                            value={
-                                content
-                            }
-                            placeholder="Escribe un mensaje..."
-                            className="chat-input"
-                            rows="1"
-                            disabled={
-                                sending
-                            }
-                            onChange={
-                                (event) =>
-                                    setContent(
-                                        event.target.value
-                                    )
-                            }
-                            onKeyDown={
-                                handleKeyDown
-                            }
-                        />
-
-
-                        <button
-                            type="submit"
-                            className="chat-send-button"
-                            disabled={
-                                sending ||
-                                !content.trim()
-                            }
-                        >
-
-                            {
-                                sending
-                                    ? "Enviando..."
-                                    : "Enviar"
-                            }
-
-                        </button>
-
-                    </form>
-
-
-                    <div className="chat-footer">
-
-                        Conversación iniciada el{" "}
-
-                        {
-                            formatDate(
-                                chat.openedAt
-                            )
-                        }
-
-                    </div>
-
-
-                </div>
+                {chatContent}
 
             </div>
 
         </div>
     );
+}
+
+
+async function getResponseData(
+    response
+) {
+
+    const text =
+        await response.text();
+
+
+    if (!text) {
+        return null;
+    }
+
+
+    try {
+
+        return JSON.parse(
+            text
+        );
+
+    } catch {
+
+        return text;
+    }
 }

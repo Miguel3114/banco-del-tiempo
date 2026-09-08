@@ -33,8 +33,8 @@ import ListingEdit
 import MyListings
     from "./listing/MyListings";
 
-import ChatDetails
-    from "./chat/ChatDetails";
+import Mailbox
+    from "./chat/Mailbox";
 
 import Profile
     from "./user/profile/Profile";
@@ -203,10 +203,19 @@ function App() {
                 />
 
                 <Route
+                    path="/chats"
+                    element={
+                        <PrivateRoute>
+                            <Mailbox />
+                        </PrivateRoute>
+                    }
+                />
+
+                <Route
                     path="/chats/:id"
                     element={
                         <PrivateRoute>
-                            <ChatDetails />
+                            <Mailbox />
                         </PrivateRoute>
                     }
                 />
