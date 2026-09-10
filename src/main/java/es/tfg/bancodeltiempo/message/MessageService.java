@@ -33,7 +33,6 @@ public class MessageService {
         List<Message> messages = this.messageRepository.findByChat(chat.getId());
 
         for (Message message : messages) {
-
             if (message.getSender() != null
                     && !message.getSender().getId().equals(currentUser.getId())
                     && message.getReadStatus() == ReadStatus.UNREAD) {
@@ -56,6 +55,17 @@ public class MessageService {
         message.setSender(currentUser);
         message.setContent(request.getContent().trim());
         message.setReadStatus(ReadStatus.UNREAD);
+
+        return this.messageRepository.save(message);
+    }
+
+    @Transactional
+    public Message createSystemMessage(Chat chat, String content) {
+        Message message = new Message();
+        message.setChat(chat);
+        message.setSender(null);
+        message.setContent(content);
+        message.setReadStatus(ReadStatus.READ);
 
         return this.messageRepository.save(message);
     }
