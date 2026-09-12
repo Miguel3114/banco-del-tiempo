@@ -10,6 +10,9 @@ import org.springframework.transaction.annotation.Transactional;
 import es.tfg.bancodeltiempo.exceptions.ConflictException;
 import es.tfg.bancodeltiempo.exceptions.ResourceNotFoundException;
 import es.tfg.bancodeltiempo.exceptions.ResourceNotOwnedException;
+import es.tfg.bancodeltiempo.exchange.Exchange;
+import es.tfg.bancodeltiempo.exchange.ExchangeRepository;
+import es.tfg.bancodeltiempo.exchange.ExchangeStatus;
 import es.tfg.bancodeltiempo.listing.Listing;
 import es.tfg.bancodeltiempo.listing.ListingService;
 import es.tfg.bancodeltiempo.user.User;
@@ -21,12 +24,15 @@ public class ChatService {
     private final ChatRepository chatRepository;
     private final ListingService listingService;
     private final UserService userService;
+    private final ExchangeRepository exchangeRepository;
 
     @Autowired
-    public ChatService(ChatRepository chatRepository, ListingService listingService, UserService userService) {
+    public ChatService(ChatRepository chatRepository, ListingService listingService, UserService userService,
+            ExchangeRepository exchangeRepository) {
         this.chatRepository = chatRepository;
         this.listingService = listingService;
         this.userService = userService;
+        this.exchangeRepository = exchangeRepository;
     }
 
     @Transactional
@@ -82,6 +88,28 @@ public class ChatService {
         return this.chatRepository.findByUser(
                 currentUser.getId(),
                 ChatStatus.ACTIVE);
+    }
+
+    @Transactional
+    public void archiveChat(Integer id) {
+        Chat chat = this.findChat(id);
+        User currentUser = this.userService.findCurrentUser();
+
+        Exchange exchange = this.exchangeRepository.findByChat(chat.getId())
+                .orElseThrow(() -> new ConflictException(
+                        "No puedes archivar un chat sin un intercambio aceptado"));
+
+        if (exchange.getStatus() != ExchangeStatus.ACCEPTED) {
+            throw new ConflictException("Solo puedes archivar un chat cuando el intercambio haya sido aceptado");
+        }
+
+        if (chat.getListing().getAuthor().getId().equals(currentUser.getId())) {
+            chat.setAuthorStatus(ChatStatus.ARCHIVED);
+        } else {
+            chat.setInterestedUserStatus(ChatStatus.ARCHIVED);
+        }
+
+        this.chatRepository.save(chat);
     }
 
     public void checkParticipant(Chat chat, User user) {
