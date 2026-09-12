@@ -36,6 +36,9 @@ import MyListings
 import Mailbox
     from "./chat/Mailbox";
 
+import Exchanges
+    from "./exchange/Exchanges";
+
 import Profile
     from "./user/profile/Profile";
 
@@ -216,6 +219,15 @@ function App() {
                     element={
                         <PrivateRoute>
                             <Mailbox />
+                        </PrivateRoute>
+                    }
+                />
+
+                <Route
+                    path="/exchanges"
+                    element={
+                        <PrivateRoute>
+                            <Exchanges />
                         </PrivateRoute>
                     }
                 />

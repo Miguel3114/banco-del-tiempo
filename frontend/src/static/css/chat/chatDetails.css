@@ -216,6 +216,263 @@
 }
 
 
+.chat-exchange-panel {
+    position: relative;
+
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 18px;
+
+    padding: 10px 16px;
+
+    border-bottom: 1px solid #e7edf5;
+
+    background-color: #f8fbff;
+}
+
+
+.chat-exchange-info {
+    min-width: 0;
+
+    flex: 1;
+}
+
+
+.chat-exchange-title-row {
+    display: flex;
+    align-items: center;
+
+    gap: 8px;
+
+    margin-bottom: 2px;
+}
+
+
+.chat-exchange-title {
+    color: #343b48;
+
+    font-size: 11px;
+    font-weight: 700;
+}
+
+
+.chat-exchange-hours {
+    margin-top: 2px;
+
+    color: #3478df;
+
+    font-size: 13px;
+    font-weight: 700;
+}
+
+
+.chat-exchange-description {
+    margin-top: 2px;
+
+    color: #7c8595;
+
+    font-size: 9px;
+    line-height: 1.4;
+}
+
+
+.chat-exchange-status {
+    display: inline-flex;
+    align-items: center;
+
+    padding: 2px 7px;
+
+    border-radius: 20px;
+
+    font-size: 8px;
+    font-weight: 700;
+
+    text-transform: uppercase;
+}
+
+
+.chat-exchange-status-pending {
+    background-color: #fff5d9;
+
+    color: #9a6b00;
+}
+
+
+.chat-exchange-status-rejected {
+    background-color: #fff0f2;
+
+    color: #c14155;
+}
+
+
+.chat-exchange-status-accepted {
+    background-color: #eaf8ef;
+
+    color: #2d8a53;
+}
+
+
+.chat-exchange-primary-button {
+    flex-shrink: 0;
+
+    padding: 8px 12px;
+
+    border: 1px solid #3478df;
+    border-radius: 7px;
+
+    background-color: #3478df;
+
+    color: #ffffff;
+
+    font-size: 10px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+        background-color 0.2s,
+        border-color 0.2s;
+}
+
+
+.chat-exchange-primary-button:hover:not(:disabled) {
+    background-color: #2768c9;
+    border-color: #2768c9;
+}
+
+
+.chat-exchange-primary-button:disabled {
+    opacity: 0.55;
+
+    cursor: not-allowed;
+}
+
+
+.chat-exchange-form {
+    display: flex;
+    align-items: flex-end;
+
+    gap: 8px;
+
+    flex-shrink: 0;
+}
+
+
+.chat-exchange-field {
+    width: 125px;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 3px;
+}
+
+
+.chat-exchange-field label {
+    margin: 0;
+
+    color: #697384;
+
+    font-size: 8px;
+    font-weight: 600;
+}
+
+
+.chat-exchange-field input {
+    width: 100%;
+
+    padding: 7px 9px;
+
+    border: 1px solid #d9dee8;
+    border-radius: 6px;
+
+    outline: none;
+
+    color: #303643;
+
+    font-size: 10px;
+
+    background-color: #ffffff;
+
+    transition:
+        border-color 0.2s,
+        box-shadow 0.2s;
+}
+
+
+.chat-exchange-field input:focus {
+    border-color: #70a5f5;
+
+    box-shadow:
+        0 0 0 3px rgba(70, 133, 230, 0.1);
+}
+
+
+.chat-exchange-form-actions {
+    display: flex;
+    align-items: center;
+
+    gap: 6px;
+}
+
+
+.chat-exchange-cancel-button {
+    padding: 8px 10px;
+
+    border: 1px solid #d7dce5;
+    border-radius: 7px;
+
+    background-color: #ffffff;
+
+    color: #687181;
+
+    font-size: 10px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+        background-color 0.2s,
+        border-color 0.2s;
+}
+
+
+.chat-exchange-cancel-button:hover:not(:disabled) {
+    background-color: #f4f6f9;
+
+    border-color: #c8ced9;
+}
+
+
+.chat-exchange-cancel-button:disabled {
+    opacity: 0.55;
+
+    cursor: not-allowed;
+}
+
+
+.chat-exchange-alert {
+    position: absolute;
+
+    top: calc(100% + 5px);
+    right: 12px;
+
+    z-index: 3;
+
+    max-width: 360px;
+
+    margin: 0;
+
+    padding: 6px 10px;
+
+    font-size: 9px;
+}
+
+
 .chat-alert {
     margin: 10px 14px 0;
 }
@@ -343,6 +600,8 @@
 
 
 .chat-system-message span {
+    max-width: 80%;
+
     padding: 6px 11px;
 
     border-radius: 20px;
@@ -352,8 +611,12 @@
     color: #737c8c;
 
     font-size: 9px;
+    line-height: 1.4;
 
     text-align: center;
+
+    white-space: pre-wrap;
+    word-break: break-word;
 }
 
 
@@ -490,6 +753,41 @@
 
     .chat-listing-title {
         text-align: left;
+    }
+
+
+    .chat-exchange-panel {
+        align-items: stretch;
+        flex-direction: column;
+
+        gap: 9px;
+    }
+
+
+    .chat-exchange-form {
+        width: 100%;
+
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+
+    .chat-exchange-field {
+        width: 100%;
+    }
+
+
+    .chat-exchange-form-actions {
+        justify-content: flex-end;
+    }
+
+
+    .chat-exchange-alert {
+        position: static;
+
+        max-width: none;
+
+        margin: 0;
     }
 
 
