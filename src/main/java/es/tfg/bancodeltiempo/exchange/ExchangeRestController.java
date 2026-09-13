@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import es.tfg.bancodeltiempo.review.ReviewService;
 import es.tfg.bancodeltiempo.user.User;
 import es.tfg.bancodeltiempo.user.UserService;
 import jakarta.validation.Valid;
@@ -23,11 +24,14 @@ public class ExchangeRestController {
 
     private final ExchangeService exchangeService;
     private final UserService userService;
+    private final ReviewService reviewService;
 
     @Autowired
-    public ExchangeRestController(ExchangeService exchangeService, UserService userService) {
+    public ExchangeRestController(ExchangeService exchangeService, UserService userService,
+            ReviewService reviewService) {
         this.exchangeService = exchangeService;
         this.userService = userService;
+        this.reviewService = reviewService;
     }
 
     @GetMapping("/pending")
@@ -107,6 +111,15 @@ public class ExchangeRestController {
         User provider = this.exchangeService.findProvider(exchange.getChat());
         User receiver = this.exchangeService.findReceiver(exchange.getChat());
 
-        return new ExchangeDTO(exchange, currentUser, provider, receiver);
+        Boolean reviewed = this.reviewService.hasReviewed(
+                exchange.getId(),
+                currentUser.getId());
+
+        return new ExchangeDTO(
+                exchange,
+                currentUser,
+                provider,
+                receiver,
+                reviewed);
     }
 }
