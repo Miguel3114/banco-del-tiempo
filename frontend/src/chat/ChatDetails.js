@@ -5,11 +5,17 @@ import React, {
 } from "react";
 
 import {
-    Alert
+    Alert,
+    Button,
+    Modal,
+    ModalBody,
+    ModalFooter,
+    ModalHeader
 } from "reactstrap";
 
 import {
     Link,
+    useNavigate,
     useParams
 } from "react-router-dom";
 
@@ -27,6 +33,9 @@ export default function ChatDetails({
 
     const params =
         useParams();
+
+    const navigate =
+        useNavigate();
 
     const id =
         chatId ||
@@ -69,6 +78,16 @@ export default function ChatDetails({
     const [
         exchangeSaving,
         setExchangeSaving
+    ] = useState(false);
+
+    const [
+        archiveModalOpen,
+        setArchiveModalOpen
+    ] = useState(false);
+
+    const [
+        archiving,
+        setArchiving
     ] = useState(false);
 
     const [content, setContent] =
@@ -120,7 +139,6 @@ export default function ChatDetails({
                         loadExchange()
                     ]);
 
-
                 if (exchangeData) {
 
                     setCurrentUserProvider(
@@ -146,9 +164,7 @@ export default function ChatDetails({
             }
         }
 
-
         loadChatData();
-
 
         const interval =
             setInterval(
@@ -164,7 +180,6 @@ export default function ChatDetails({
                 },
                 3000
             );
-
 
         return () => {
 
@@ -201,12 +216,10 @@ export default function ChatDetails({
                 }
             );
 
-
         const data =
             await getResponseData(
                 response
             );
-
 
         if (!response.ok) {
 
@@ -216,7 +229,6 @@ export default function ChatDetails({
                 "No se ha podido cargar el chat"
             );
         }
-
 
         setChat(
             data
@@ -239,12 +251,10 @@ export default function ChatDetails({
                 }
             );
 
-
         const data =
             await getResponseData(
                 response
             );
-
 
         if (!response.ok) {
 
@@ -255,10 +265,8 @@ export default function ChatDetails({
             );
         }
 
-
         const newMessages =
             data || [];
-
 
         setMessages(
             (currentMessages) => {
@@ -275,22 +283,18 @@ export default function ChatDetails({
                             newMessages[index].id
                     );
 
-
                 if (sameMessages) {
 
                     return currentMessages;
                 }
 
-
                 return newMessages;
             }
         );
 
-
         if (onMessagesRead) {
             onMessagesRead();
         }
-
 
         return newMessages;
     }
@@ -309,12 +313,10 @@ export default function ChatDetails({
                 }
             );
 
-
         const data =
             await getResponseData(
                 response
             );
-
 
         if (!response.ok) {
 
@@ -324,7 +326,6 @@ export default function ChatDetails({
                 "No se ha podido cargar el intercambio"
             );
         }
-
 
         if (
             response.status === 204 ||
@@ -338,7 +339,6 @@ export default function ChatDetails({
             return null;
         }
 
-
         setExchange(
             data
         );
@@ -346,7 +346,6 @@ export default function ChatDetails({
         setCurrentUserProvider(
             data.currentUserProvider === true
         );
-
 
         if (
             data.status !== "REJECTED"
@@ -360,7 +359,6 @@ export default function ChatDetails({
                 null
             );
         }
-
 
         return data;
     }
@@ -397,7 +395,6 @@ export default function ChatDetails({
                 )
             ]);
 
-
         const userData =
             await getResponseData(
                 userResponse
@@ -408,7 +405,6 @@ export default function ChatDetails({
                 listingResponse
             );
 
-
         if (!userResponse.ok) {
 
             throw new Error(
@@ -417,7 +413,6 @@ export default function ChatDetails({
                 "No se ha podido cargar el usuario"
             );
         }
-
 
         if (!listingResponse.ok) {
 
@@ -428,11 +423,9 @@ export default function ChatDetails({
             );
         }
 
-
         const currentUserIsAuthor =
             listingData.author?.id ===
             userData.id;
-
 
         if (
             chatData.listingType ===
@@ -458,15 +451,12 @@ export default function ChatDetails({
 
         event.preventDefault();
 
-
         const trimmedContent =
             content.trim();
-
 
         if (!trimmedContent) {
             return;
         }
-
 
         setSending(true);
         setMessage(null);
@@ -497,12 +487,10 @@ export default function ChatDetails({
                     }
                 );
 
-
             const data =
                 await getResponseData(
                     response
                 );
-
 
             if (!response.ok) {
 
@@ -513,10 +501,8 @@ export default function ChatDetails({
                 );
             }
 
-
             shouldAutoScrollRef.current =
                 true;
-
 
             setMessages(
                 (currentMessages) => [
@@ -525,9 +511,7 @@ export default function ChatDetails({
                 ]
             );
 
-
             setContent("");
-
 
             if (onMessagesRead) {
                 onMessagesRead();
@@ -551,17 +535,14 @@ export default function ChatDetails({
         const container =
             messagesContainerRef.current;
 
-
         if (!container) {
             return;
         }
-
 
         const distanceFromBottom =
             container.scrollHeight -
             container.scrollTop -
             container.clientHeight;
-
 
         shouldAutoScrollRef.current =
             distanceFromBottom <
@@ -579,7 +560,6 @@ export default function ChatDetails({
             null
         );
 
-
         if (
             exchange?.status ===
             "REJECTED"
@@ -595,7 +575,6 @@ export default function ChatDetails({
                 ""
             );
         }
-
 
         setExchangeFormOpen(
             true
@@ -637,10 +616,8 @@ export default function ChatDetails({
             null
         );
 
-
         const hoursValue =
             exchangeHours.trim();
-
 
         if (!hoursValue) {
 
@@ -651,12 +628,10 @@ export default function ChatDetails({
             return;
         }
 
-
         const hours =
             Number(
                 hoursValue
             );
-
 
         if (
             !Number.isInteger(
@@ -672,11 +647,9 @@ export default function ChatDetails({
             return;
         }
 
-
         const resend =
             exchange?.status ===
             "REJECTED";
-
 
         const url =
             resend
@@ -688,11 +661,9 @@ export default function ChatDetails({
                 ? "PUT"
                 : "POST";
 
-
         setExchangeSaving(
             true
         );
-
 
         try {
 
@@ -719,12 +690,10 @@ export default function ChatDetails({
                     }
                 );
 
-
             const data =
                 await getResponseData(
                     response
                 );
-
 
             if (!response.ok) {
 
@@ -732,7 +701,6 @@ export default function ChatDetails({
                     data?.message ||
                     data ||
                     "No se ha podido guardar el intercambio";
-
 
                 if (
                     response.status ===
@@ -752,7 +720,6 @@ export default function ChatDetails({
 
                 return;
             }
-
 
             setExchange(
                 data
@@ -778,9 +745,7 @@ export default function ChatDetails({
                 null
             );
 
-
             await loadMessages();
-
 
         } catch (error) {
 
@@ -792,6 +757,97 @@ export default function ChatDetails({
         } finally {
 
             setExchangeSaving(
+                false
+            );
+        }
+    }
+
+
+    function openArchiveModal() {
+
+        setExchangeActionError(
+            null
+        );
+
+        setArchiveModalOpen(
+            true
+        );
+    }
+
+
+    function closeArchiveModal() {
+
+        if (archiving) {
+            return;
+        }
+
+        setArchiveModalOpen(
+            false
+        );
+    }
+
+
+    async function handleArchiveChat() {
+
+        setArchiving(
+            true
+        );
+
+        setExchangeActionError(
+            null
+        );
+
+        try {
+
+            const response =
+                await fetch(
+                    `/api/chats/${id}/archive`,
+                    {
+                        method: "PUT",
+
+                        headers: {
+                            Authorization:
+                                `Bearer ${jwt}`
+                        }
+                    }
+                );
+
+            const data =
+                await getResponseData(
+                    response
+                );
+
+            if (!response.ok) {
+
+                throw new Error(
+                    data?.message ||
+                    data ||
+                    "No se ha podido archivar la conversación"
+                );
+            }
+
+            setArchiveModalOpen(
+                false
+            );
+
+            navigate(
+                "/chats"
+            );
+
+        } catch (error) {
+
+            setArchiveModalOpen(
+                false
+            );
+
+            setExchangeActionError(
+                error.message ||
+                "No se ha podido archivar la conversación"
+            );
+
+        } finally {
+
+            setArchiving(
                 false
             );
         }
@@ -835,7 +891,6 @@ export default function ChatDetails({
             return "";
         }
 
-
         return new Date(
             date
         )
@@ -856,7 +911,6 @@ export default function ChatDetails({
         if (!date) {
             return "";
         }
-
 
         return new Date(
             date
@@ -888,13 +942,11 @@ export default function ChatDetails({
             return "?";
         }
 
-
         const firstName =
             chat.otherUserFirstName || "";
 
         const lastName =
             chat.otherUserLastName || "";
-
 
         return (
             firstName.charAt(0) +
@@ -922,7 +974,6 @@ export default function ChatDetails({
                         Horas realizadas
                     </label>
 
-
                     <input
                         id={`exchange-hours-${id}`}
                         type="number"
@@ -949,7 +1000,6 @@ export default function ChatDetails({
                         }
                     />
 
-
                     {
                         exchangeHoursError
                             ? (
@@ -966,7 +1016,6 @@ export default function ChatDetails({
 
                 </div>
 
-
                 <div className="chat-exchange-form-actions">
 
                     <button
@@ -981,7 +1030,6 @@ export default function ChatDetails({
                     >
                         Cancelar
                     </button>
-
 
                     <button
                         type="submit"
@@ -1019,7 +1067,6 @@ export default function ChatDetails({
             return null;
         }
 
-
         if (!exchange) {
 
             return (
@@ -1039,7 +1086,6 @@ export default function ChatDetails({
 
                     </div>
 
-
                     {
                         exchangeFormOpen
                             ? renderExchangeForm()
@@ -1056,7 +1102,6 @@ export default function ChatDetails({
                                 </button>
                             )
                     }
-
 
                     {
                         exchangeActionError
@@ -1078,7 +1123,6 @@ export default function ChatDetails({
                 </div>
             );
         }
-
 
         if (
             exchange.status ===
@@ -1103,7 +1147,6 @@ export default function ChatDetails({
 
                         </div>
 
-
                         <div className="chat-exchange-hours">
                             {
                                 formatHours(
@@ -1111,7 +1154,6 @@ export default function ChatDetails({
                                 )
                             }
                         </div>
-
 
                         <div className="chat-exchange-description">
 
@@ -1128,7 +1170,6 @@ export default function ChatDetails({
                 </div>
             );
         }
-
 
         if (
             exchange.status ===
@@ -1153,7 +1194,6 @@ export default function ChatDetails({
 
                         </div>
 
-
                         <div className="chat-exchange-hours">
                             {
                                 formatHours(
@@ -1161,7 +1201,6 @@ export default function ChatDetails({
                                 )
                             }
                         </div>
-
 
                         <div className="chat-exchange-description">
 
@@ -1174,7 +1213,6 @@ export default function ChatDetails({
                         </div>
 
                     </div>
-
 
                     {
                         exchange.currentUserProvider
@@ -1198,7 +1236,6 @@ export default function ChatDetails({
                             : null
                     }
 
-
                     {
                         exchangeActionError
                             ? (
@@ -1219,7 +1256,6 @@ export default function ChatDetails({
                 </div>
             );
         }
-
 
         if (
             exchange.status ===
@@ -1244,7 +1280,6 @@ export default function ChatDetails({
 
                         </div>
 
-
                         <div className="chat-exchange-hours">
                             {
                                 formatHours(
@@ -1253,7 +1288,6 @@ export default function ChatDetails({
                             }
                         </div>
 
-
                         <div className="chat-exchange-description">
                             Las horas han sido confirmadas
                             y los saldos se han actualizado.
@@ -1261,10 +1295,39 @@ export default function ChatDetails({
 
                     </div>
 
+                    <button
+                        type="button"
+                        className="chat-exchange-cancel-button"
+                        disabled={
+                            archiving
+                        }
+                        onClick={
+                            openArchiveModal
+                        }
+                    >
+                        Archivar chat
+                    </button>
+
+                    {
+                        exchangeActionError
+                            ? (
+
+                                <Alert
+                                    color="danger"
+                                    className="chat-exchange-alert"
+                                >
+                                    {
+                                        exchangeActionError
+                                    }
+                                </Alert>
+
+                            )
+                            : null
+                    }
+
                 </div>
             );
         }
-
 
         return null;
     }
@@ -1281,7 +1344,6 @@ export default function ChatDetails({
                 </div>
             );
         }
-
 
         return (
 
@@ -1319,7 +1381,6 @@ export default function ChatDetails({
                 </div>
             );
         }
-
 
         return (
 
@@ -1362,9 +1423,7 @@ export default function ChatDetails({
             }
         >
 
-
             <div className="chat-header">
-
 
                 <Link
                     to={
@@ -1400,7 +1459,6 @@ export default function ChatDetails({
                             )
                     }
 
-
                     <div className="chat-user-info">
 
                         <h1>
@@ -1417,7 +1475,6 @@ export default function ChatDetails({
 
                         </h1>
 
-
                         <span>
                             Ver perfil
                         </span>
@@ -1425,7 +1482,6 @@ export default function ChatDetails({
                     </div>
 
                 </Link>
-
 
                 <Link
                     to={
@@ -1446,11 +1502,9 @@ export default function ChatDetails({
 
             </div>
 
-
             {
                 renderExchangePanel()
             }
-
 
             {
                 message
@@ -1467,7 +1521,6 @@ export default function ChatDetails({
                     : null
             }
 
-
             <div
                 className="chat-messages"
                 ref={
@@ -1477,7 +1530,6 @@ export default function ChatDetails({
                     handleMessagesScroll
                 }
             >
-
 
                 {
                     messages.length === 0
@@ -1526,7 +1578,6 @@ export default function ChatDetails({
                                         );
                                     }
 
-
                                     return (
 
                                         <div
@@ -1554,7 +1605,6 @@ export default function ChatDetails({
                                                     }
                                                 </p>
 
-
                                                 <span className="chat-message-time">
 
                                                     {
@@ -1574,7 +1624,6 @@ export default function ChatDetails({
                         )
                 }
 
-
                 <div
                     ref={
                         messagesEndRef
@@ -1582,7 +1631,6 @@ export default function ChatDetails({
                 />
 
             </div>
-
 
             <form
                 className="chat-form"
@@ -1612,7 +1660,6 @@ export default function ChatDetails({
                     }
                 />
 
-
                 <button
                     type="submit"
                     className="chat-send-button"
@@ -1632,7 +1679,6 @@ export default function ChatDetails({
 
             </form>
 
-
             <div className="chat-footer">
 
                 Conversación iniciada el{" "}
@@ -1646,6 +1692,72 @@ export default function ChatDetails({
             </div>
 
 
+            <Modal
+                isOpen={
+                    archiveModalOpen
+                }
+                toggle={
+                    closeArchiveModal
+                }
+                centered
+            >
+
+                <ModalHeader
+                    toggle={
+                        closeArchiveModal
+                    }
+                >
+                    Archivar conversación
+                </ModalHeader>
+
+                <ModalBody>
+
+                    La conversación dejará de aparecer
+                    en tu buzón.
+
+                    <br />
+                    <br />
+
+                    ¿Estás seguro de archivar la conversación?
+
+                </ModalBody>
+
+                <ModalFooter>
+
+                    <Button
+                        color="secondary"
+                        disabled={
+                            archiving
+                        }
+                        onClick={
+                            closeArchiveModal
+                        }
+                    >
+                        Cancelar
+                    </Button>
+
+                    <Button
+                        color="primary"
+                        disabled={
+                            archiving
+                        }
+                        onClick={
+                            handleArchiveChat
+                        }
+                    >
+
+                        {
+                            archiving
+                                ? "Archivando..."
+                                : "Archivar"
+                        }
+
+                    </Button>
+
+                </ModalFooter>
+
+            </Modal>
+
         </div>
     );
 
@@ -1654,7 +1766,6 @@ export default function ChatDetails({
 
         return chatContent;
     }
-
 
     return (
 
@@ -1678,11 +1789,9 @@ async function getResponseData(
     const text =
         await response.text();
 
-
     if (!text) {
         return null;
     }
-
 
     try {
 
