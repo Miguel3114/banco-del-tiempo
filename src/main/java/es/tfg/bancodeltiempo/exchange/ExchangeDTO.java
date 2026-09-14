@@ -30,8 +30,9 @@ public class ExchangeDTO {
 
     private Boolean currentUserProvider;
     private Boolean currentUserReceiver;
+    private Boolean reviewed;
 
-    public ExchangeDTO(Exchange exchange, User currentUser, User provider, User receiver) {
+    public ExchangeDTO(Exchange exchange, User currentUser, User provider, User receiver, Boolean reviewed) {
         this.id = exchange.getId();
         this.chatId = exchange.getChat().getId();
         this.listingId = exchange.getChat().getListing().getId();
@@ -53,5 +54,6 @@ public class ExchangeDTO {
 
         this.currentUserProvider = currentUser.getId().equals(provider.getId());
         this.currentUserReceiver = currentUser.getId().equals(receiver.getId());
+        this.reviewed = reviewed;
     }
 }

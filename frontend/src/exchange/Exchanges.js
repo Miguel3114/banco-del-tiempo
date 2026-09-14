@@ -4,7 +4,12 @@ import React, {
 } from "react";
 
 import {
-    Alert
+    Alert,
+    Button,
+    Modal,
+    ModalBody,
+    ModalFooter,
+    ModalHeader
 } from "reactstrap";
 
 import {
@@ -45,6 +50,24 @@ export default function Exchanges() {
 
     const [actionLoading, setActionLoading] =
         useState(null);
+
+    const [reviewExchange, setReviewExchange] =
+        useState(null);
+
+    const [reviewRating, setReviewRating] =
+        useState(0);
+
+    const [reviewComment, setReviewComment] =
+        useState("");
+
+    const [reviewRatingError, setReviewRatingError] =
+        useState(null);
+
+    const [reviewError, setReviewError] =
+        useState(null);
+
+    const [reviewSaving, setReviewSaving] =
+        useState(false);
 
     const jwt =
         tokenService.getLocalAccessToken();
@@ -90,7 +113,6 @@ export default function Exchanges() {
                     )
                 ]);
 
-
             const pendingData =
                 await getResponseData(
                     pendingResponse
@@ -101,7 +123,6 @@ export default function Exchanges() {
                     historyResponse
                 );
 
-
             if (!pendingResponse.ok) {
 
                 throw new Error(
@@ -111,7 +132,6 @@ export default function Exchanges() {
                 );
             }
 
-
             if (!historyResponse.ok) {
 
                 throw new Error(
@@ -120,7 +140,6 @@ export default function Exchanges() {
                     "No se ha podido cargar el historial"
                 );
             }
-
 
             setPendingExchanges(
                 pendingData || []
@@ -153,7 +172,6 @@ export default function Exchanges() {
 
         setMessage(null);
 
-
         try {
 
             const response =
@@ -169,12 +187,10 @@ export default function Exchanges() {
                     }
                 );
 
-
             const data =
                 await getResponseData(
                     response
                 );
-
 
             if (!response.ok) {
 
@@ -184,7 +200,6 @@ export default function Exchanges() {
                     "No se ha podido aceptar el intercambio"
                 );
             }
-
 
             await loadData();
 
@@ -256,10 +271,8 @@ export default function Exchanges() {
             null
         );
 
-
         const reason =
             rejectReason.trim();
-
 
         if (!reason) {
 
@@ -270,11 +283,9 @@ export default function Exchanges() {
             return;
         }
 
-
         setActionLoading(
             `reject-${exchange.id}`
         );
-
 
         try {
 
@@ -301,12 +312,10 @@ export default function Exchanges() {
                     }
                 );
 
-
             const data =
                 await getResponseData(
                     response
                 );
-
 
             if (!response.ok) {
 
@@ -324,14 +333,12 @@ export default function Exchanges() {
                     return;
                 }
 
-
                 throw new Error(
                     data?.message ||
                     data ||
                     "No se ha podido rechazar el intercambio"
                 );
             }
-
 
             closeRejectForm();
 
@@ -347,6 +354,196 @@ export default function Exchanges() {
 
             setActionLoading(
                 null
+            );
+        }
+    }
+
+
+    function openReviewModal(
+        exchange
+    ) {
+
+        setReviewExchange(
+            exchange
+        );
+
+        setReviewRating(
+            0
+        );
+
+        setReviewComment(
+            ""
+        );
+
+        setReviewRatingError(
+            null
+        );
+
+        setReviewError(
+            null
+        );
+    }
+
+
+    function closeReviewModal() {
+
+        if (reviewSaving) {
+            return;
+        }
+
+        setReviewExchange(
+            null
+        );
+
+        setReviewRating(
+            0
+        );
+
+        setReviewComment(
+            ""
+        );
+
+        setReviewRatingError(
+            null
+        );
+
+        setReviewError(
+            null
+        );
+    }
+
+
+    async function createReview() {
+
+        setReviewRatingError(
+            null
+        );
+
+        setReviewError(
+            null
+        );
+
+        if (
+            reviewRating < 1 ||
+            reviewRating > 5
+        ) {
+
+            setReviewRatingError(
+                "Selecciona una puntuación de 1 a 5 estrellas"
+            );
+
+            return;
+        }
+
+        setReviewSaving(
+            true
+        );
+
+        try {
+
+            const response =
+                await fetch(
+                    `/api/reviews/exchanges/${reviewExchange.id}`,
+                    {
+                        method: "POST",
+
+                        headers: {
+                            Authorization:
+                                `Bearer ${jwt}`,
+
+                            "Content-Type":
+                                "application/json"
+                        },
+
+                        body:
+                            JSON.stringify(
+                                {
+                                    rating:
+                                        reviewRating,
+
+                                    comment:
+                                        reviewComment.trim()
+                                }
+                            )
+                    }
+                );
+
+            const data =
+                await getResponseData(
+                    response
+                );
+
+            if (!response.ok) {
+
+                const errorMessage =
+                    data?.message ||
+                    data ||
+                    "No se ha podido publicar la valoración";
+
+                if (
+                    response.status ===
+                    400
+                ) {
+
+                    setReviewRatingError(
+                        errorMessage
+                    );
+
+                    return;
+                }
+
+                setReviewError(
+                    errorMessage
+                );
+
+                return;
+            }
+
+            setHistoryExchanges(
+                (currentExchanges) =>
+                    currentExchanges.map(
+                        (exchange) =>
+                            exchange.id ===
+                            reviewExchange.id
+                                ? {
+                                    ...exchange,
+                                    reviewed: true
+                                }
+                                : exchange
+                    )
+            );
+
+            setReviewExchange(
+                null
+            );
+
+            setReviewRating(
+                0
+            );
+
+            setReviewComment(
+                ""
+            );
+
+            setReviewRatingError(
+                null
+            );
+
+            setReviewError(
+                null
+            );
+
+        } catch (error) {
+
+            setReviewError(
+                error.message ||
+                "No se ha podido conectar con el servidor"
+            );
+
+        } finally {
+
+            setReviewSaving(
+                false
             );
         }
     }
@@ -369,7 +566,6 @@ export default function Exchanges() {
         if (!date) {
             return "";
         }
-
 
         return new Date(
             date
@@ -408,7 +604,6 @@ export default function Exchanges() {
             };
         }
 
-
         return {
             id:
                 exchange.providerId,
@@ -434,7 +629,6 @@ export default function Exchanges() {
 
         const lastName =
             user.lastName || "";
-
 
         return (
             firstName.charAt(0) +
@@ -472,7 +666,6 @@ export default function Exchanges() {
                 exchange.providerProfileImageUrl
         };
 
-
         const accepting =
             actionLoading ===
             `accept-${exchange.id}`;
@@ -484,7 +677,6 @@ export default function Exchanges() {
         const rejectFormOpen =
             rejectExchangeId ===
             exchange.id;
-
 
         return (
 
@@ -516,13 +708,11 @@ export default function Exchanges() {
 
                     </div>
 
-
                     <span className="exchange-status exchange-status-pending">
                         Pendiente
                     </span>
 
                 </div>
-
 
                 <div className="exchange-user-row">
 
@@ -560,7 +750,6 @@ export default function Exchanges() {
                                 )
                         }
 
-
                         <div>
 
                             <span className="exchange-user-label">
@@ -582,7 +771,6 @@ export default function Exchanges() {
 
                 </div>
 
-
                 <div className="exchange-data">
 
                     <div className="exchange-hours">
@@ -600,7 +788,6 @@ export default function Exchanges() {
                         </strong>
 
                     </div>
-
 
                     <div className="exchange-date">
 
@@ -620,13 +807,13 @@ export default function Exchanges() {
 
                 </div>
 
-
                 <div className="exchange-links">
 
                     <Link
                         to={
                             `/chats/${exchange.chatId}`
                         }
+                        className="btn btn-outline-primary btn-lg"
                     >
                         Ver conversación
                     </Link>
@@ -637,12 +824,12 @@ export default function Exchanges() {
                                 exchange
                             )
                         }
+                        className="btn btn-outline-primary btn-lg"
                     >
                         Ver anuncio
                     </Link>
 
                 </div>
-
 
                 {
                     rejectFormOpen
@@ -666,7 +853,6 @@ export default function Exchanges() {
                                 >
                                     Motivo del rechazo
                                 </label>
-
 
                                 <textarea
                                     id={
@@ -694,7 +880,6 @@ export default function Exchanges() {
                                     }
                                 />
 
-
                                 {
                                     rejectReasonError
                                         ? (
@@ -708,7 +893,6 @@ export default function Exchanges() {
                                         )
                                         : null
                                 }
-
 
                                 <div className="exchange-reject-actions">
 
@@ -724,7 +908,6 @@ export default function Exchanges() {
                                     >
                                         Cancelar
                                     </button>
-
 
                                     <button
                                         type="submit"
@@ -768,7 +951,6 @@ export default function Exchanges() {
                                     Rechazar
                                 </button>
 
-
                                 <button
                                     type="button"
                                     className="exchange-accept-button"
@@ -810,7 +992,6 @@ export default function Exchanges() {
                 exchange
             );
 
-
         return (
 
             <article
@@ -841,13 +1022,11 @@ export default function Exchanges() {
 
                     </div>
 
-
                     <span className="exchange-status exchange-status-accepted">
                         Aceptado
                     </span>
 
                 </div>
-
 
                 <Link
                     to={
@@ -883,7 +1062,6 @@ export default function Exchanges() {
                             )
                     }
 
-
                     <div>
 
                         <span className="exchange-user-label">
@@ -903,7 +1081,6 @@ export default function Exchanges() {
 
                 </Link>
 
-
                 <div className="exchange-data">
 
                     <div className="exchange-hours">
@@ -921,7 +1098,6 @@ export default function Exchanges() {
                         </strong>
 
                     </div>
-
 
                     <div className="exchange-date">
 
@@ -941,24 +1117,13 @@ export default function Exchanges() {
 
                 </div>
 
-
-                <div className="exchange-role">
-
-                    {
-                        exchange.currentUserProvider
-                            ? "Has prestado este servicio"
-                            : "Has recibido este servicio"
-                    }
-
-                </div>
-
-
                 <div className="exchange-links">
 
                     <Link
                         to={
                             `/chats/${exchange.chatId}`
                         }
+                        className="btn btn-outline-primary exchange-history-button"
                     >
                         Ver conversación
                     </Link>
@@ -969,13 +1134,251 @@ export default function Exchanges() {
                                 exchange
                             )
                         }
+                        className="btn btn-outline-primary exchange-history-button"
                     >
                         Ver anuncio
                     </Link>
 
+                    {
+                        exchange.reviewed
+                            ? (
+
+                                <span className="btn btn-success exchange-history-button">
+                                    ✓ Valorado
+                                </span>
+
+                            )
+                            : (
+
+                                <Button
+                                    type="button"
+                                    color="primary"
+                                    className="exchange-history-button"
+                                    onClick={
+                                        () =>
+                                            openReviewModal(
+                                                exchange
+                                            )
+                                    }
+                                >
+                                    Valorar
+                                </Button>
+                            )
+                    }
+
                 </div>
 
             </article>
+        );
+    }
+
+
+    function renderReviewModal() {
+
+        if (!reviewExchange) {
+            return null;
+        }
+
+        const otherUser =
+            getOtherUser(
+                reviewExchange
+            );
+
+        return (
+
+            <Modal
+                isOpen={
+                    reviewExchange !== null
+                }
+                toggle={
+                    closeReviewModal
+                }
+                centered
+            >
+
+                <ModalHeader
+                    toggle={
+                        closeReviewModal
+                    }
+                >
+                    Valorar a{" "}
+                    {
+                        otherUser.firstName
+                    }
+                </ModalHeader>
+
+                <ModalBody>
+
+                    <p className="mb-2">
+                        ¿Cómo valorarías tu experiencia
+                        en este intercambio?
+                    </p>
+
+                    <div className="mb-3">
+
+                        <label className="form-label">
+                            Puntuación
+                        </label>
+
+                        <div className="d-flex gap-2">
+
+                            {
+                                [
+                                    1,
+                                    2,
+                                    3,
+                                    4,
+                                    5
+                                ].map(
+                                    (rating) => (
+
+                                        <Button
+                                            key={
+                                                rating
+                                            }
+                                            type="button"
+                                            color="link"
+                                            className="p-0 border-0 shadow-none text-decoration-none text-warning fs-2"
+                                            disabled={
+                                                reviewSaving
+                                            }
+                                            aria-label={
+                                                `${rating} ${rating === 1
+                                                    ? "estrella"
+                                                    : "estrellas"}`
+                                            }
+                                            onClick={
+                                                () => {
+
+                                                    setReviewRating(
+                                                        rating
+                                                    );
+
+                                                    setReviewRatingError(
+                                                        null
+                                                    );
+                                                }
+                                            }
+                                        >
+                                            {
+                                                rating <=
+                                                reviewRating
+                                                    ? "★"
+                                                    : "☆"
+                                            }
+                                        </Button>
+                                    )
+                                )
+                            }
+
+                        </div>
+
+                        {
+                            reviewRatingError
+                                ? (
+
+                                    <span className="class-error-message">
+                                        {
+                                            reviewRatingError
+                                        }
+                                    </span>
+
+                                )
+                                : null
+                        }
+
+                    </div>
+
+                    <div className="mb-3">
+
+                        <label
+                            htmlFor="review-comment"
+                            className="form-label"
+                        >
+                            Comentario
+                            {" "}
+                            <span className="text-muted">
+                                (opcional)
+                            </span>
+                        </label>
+
+                        <textarea
+                            id="review-comment"
+                            className="form-control"
+                            rows="4"
+                            value={
+                                reviewComment
+                            }
+                            disabled={
+                                reviewSaving
+                            }
+                            placeholder="Cuenta brevemente cómo ha sido tu experiencia..."
+                            onChange={
+                                (event) =>
+                                    setReviewComment(
+                                        event.target.value
+                                    )
+                            }
+                        />
+
+                    </div>
+
+                    {
+                        reviewError
+                            ? (
+
+                                <Alert
+                                    color="danger"
+                                    className="mb-0"
+                                >
+                                    {
+                                        reviewError
+                                    }
+                                </Alert>
+
+                            )
+                            : null
+                    }
+
+                </ModalBody>
+
+                <ModalFooter>
+
+                    <Button
+                        type="button"
+                        color="secondary"
+                        disabled={
+                            reviewSaving
+                        }
+                        onClick={
+                            closeReviewModal
+                        }
+                    >
+                        Cancelar
+                    </Button>
+
+                    <Button
+                        type="button"
+                        color="primary"
+                        disabled={
+                            reviewSaving
+                        }
+                        onClick={
+                            createReview
+                        }
+                    >
+
+                        {
+                            reviewSaving
+                                ? "Publicando..."
+                                : "Publicar valoración"
+                        }
+
+                    </Button>
+
+                </ModalFooter>
+
+            </Modal>
         );
     }
 
@@ -1005,7 +1408,6 @@ export default function Exchanges() {
 
             <div className="exchanges-container">
 
-
                 <div className="exchanges-header">
 
                     <div>
@@ -1023,7 +1425,6 @@ export default function Exchanges() {
 
                 </div>
 
-
                 {
                     message
                         ? (
@@ -1035,7 +1436,6 @@ export default function Exchanges() {
                         )
                         : null
                 }
-
 
                 <div className="exchanges-tabs">
 
@@ -1074,7 +1474,6 @@ export default function Exchanges() {
 
                     </button>
 
-
                     <button
                         type="button"
                         className={
@@ -1094,7 +1493,6 @@ export default function Exchanges() {
                     </button>
 
                 </div>
-
 
                 <div className="exchanges-content">
 
@@ -1182,8 +1580,11 @@ export default function Exchanges() {
 
                 </div>
 
-
             </div>
+
+            {
+                renderReviewModal()
+            }
 
         </div>
     );
@@ -1197,11 +1598,9 @@ async function getResponseData(
     const text =
         await response.text();
 
-
     if (!text) {
         return null;
     }
-
 
     try {
 

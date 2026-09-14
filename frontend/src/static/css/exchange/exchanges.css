@@ -382,6 +382,38 @@
 }
 
 
+.exchange-links .exchange-history-button {
+    height: 36px;
+    min-height: 36px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 0 14px;
+
+    border-radius: 7px;
+
+    font-size: 10px !important;
+    font-weight: 600;
+    line-height: 1;
+
+    box-sizing: border-box;
+}
+
+
+.exchange-links a.exchange-history-button {
+    color: #3478df;
+
+    text-decoration: none;
+}
+
+
+.exchange-links a.exchange-history-button:hover {
+    text-decoration: none;
+}
+
+
 .exchange-actions {
     display: flex;
     justify-content: flex-end;
@@ -635,5 +667,10 @@
     .exchange-reject-confirm-button,
     .exchange-secondary-button {
         width: 100%;
+    }
+
+
+    .exchange-links {
+        flex-wrap: wrap;
     }
 }

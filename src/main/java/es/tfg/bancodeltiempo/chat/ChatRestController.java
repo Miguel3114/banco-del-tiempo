@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -72,6 +73,13 @@ public class ChatRestController {
         User currentUser = this.userService.findCurrentUser();
 
         return ResponseEntity.ok(new ChatDTO(chat, currentUser));
+    }
+
+    @PutMapping("/{id}/archive")
+    public ResponseEntity<Void> archiveChat(@PathVariable Integer id) {
+        this.chatService.archiveChat(id);
+
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/{id}/messages")

@@ -9,6 +9,7 @@ import {
 } from "reactstrap";
 
 import {
+    Link,
     useParams
 } from "react-router-dom";
 
@@ -26,6 +27,9 @@ export default function PublicProfile() {
     const [user, setUser] =
         useState(null);
 
+    const [reviews, setReviews] =
+        useState([]);
+
     const [message, setMessage] =
         useState(null);
 
@@ -38,61 +42,88 @@ export default function PublicProfile() {
 
     useEffect(() => {
 
-        setLoading(true);
-        setMessage(null);
+        async function loadData() {
 
-        fetch(
-            `/api/users/${id}`,
-            {
-                headers: {
-                    Authorization:
-                        `Bearer ${jwt}`
-                }
-            }
-        )
-            .then(async (response) => {
+            setLoading(true);
+            setMessage(null);
 
-                const text =
-                    await response.text();
+            try {
 
-                let data;
+                const [
+                    userResponse,
+                    reviewsResponse
+                ] =
+                    await Promise.all([
+                        fetch(
+                            `/api/users/${id}`,
+                            {
+                                headers: {
+                                    Authorization:
+                                        `Bearer ${jwt}`
+                                }
+                            }
+                        ),
 
-                try {
-                    data =
-                        text
-                            ? JSON.parse(text)
-                            : null;
-                } catch {
-                    data = text;
-                }
+                        fetch(
+                            `/api/reviews/users/${id}`,
+                            {
+                                headers: {
+                                    Authorization:
+                                        `Bearer ${jwt}`
+                                }
+                            }
+                        )
+                    ]);
 
+                const userData =
+                    await getResponseData(
+                        userResponse
+                    );
 
-                if (!response.ok) {
+                const reviewsData =
+                    await getResponseData(
+                        reviewsResponse
+                    );
+
+                if (!userResponse.ok) {
 
                     throw new Error(
-                        data?.message ||
-                        data ||
+                        userData?.message ||
+                        userData ||
                         "No se ha podido cargar el perfil"
                     );
                 }
 
+                if (!reviewsResponse.ok) {
 
-                return data;
-            })
-            .then((data) => {
+                    throw new Error(
+                        reviewsData?.message ||
+                        reviewsData ||
+                        "No se han podido cargar las valoraciones"
+                    );
+                }
 
-                setUser(data);
-            })
-            .catch((error) => {
+                setUser(
+                    userData
+                );
+
+                setReviews(
+                    reviewsData || []
+                );
+
+            } catch (error) {
 
                 setMessage(
                     error.message
                 );
-            })
-            .finally(() => {
+
+            } finally {
 
                 setLoading(false);
-            });
+            }
+        }
+
+        loadData();
 
     }, [id, jwt]);
 
@@ -122,6 +153,29 @@ export default function PublicProfile() {
     }
 
 
+    function getReviewAuthorInitials(
+        review
+    ) {
+
+        const firstInitial =
+            review.authorFirstName
+                ? review.authorFirstName
+                    .charAt(0)
+                    .toUpperCase()
+                : "";
+
+        const lastInitial =
+            review.authorLastName
+                ? review.authorLastName
+                    .charAt(0)
+                    .toUpperCase()
+                : "";
+
+        return firstInitial +
+            lastInitial;
+    }
+
+
     function getRating() {
 
         if (
@@ -137,6 +191,44 @@ export default function PublicProfile() {
     }
 
 
+    function getAverageStars() {
+
+        if (
+            user.averageRating === null ||
+            user.averageRating === undefined
+        ) {
+            return "☆☆☆☆☆";
+        }
+
+        const rating =
+            Math.round(
+                Number(
+                    user.averageRating
+                )
+            );
+
+        return "★".repeat(
+            rating
+        ) +
+            "☆".repeat(
+                5 - rating
+            );
+    }
+
+
+    function getReviewStars(
+        rating
+    ) {
+
+        return "★".repeat(
+            rating
+        ) +
+            "☆".repeat(
+                5 - rating
+            );
+    }
+
+
     function getBalance() {
 
         const balance =
@@ -147,6 +239,28 @@ export default function PublicProfile() {
         }
 
         return balance;
+    }
+
+
+    function formatDate(
+        date
+    ) {
+
+        if (!date) {
+            return "";
+        }
+
+        return new Date(
+            date
+        )
+            .toLocaleDateString(
+                "es-ES",
+                {
+                    day: "2-digit",
+                    month: "2-digit",
+                    year: "numeric"
+                }
+            );
     }
 
 
@@ -197,15 +311,17 @@ export default function PublicProfile() {
 
             <div className="profile-container">
 
+                {
+                    message
+                        ? (
 
-                {message ? (
+                            <Alert color="danger">
+                                {message}
+                            </Alert>
 
-                    <Alert color="danger">
-                        {message}
-                    </Alert>
-
-                ) : null}
-
+                        )
+                        : null
+                }
 
                 <section className="profile-main-card">
 
@@ -236,7 +352,6 @@ export default function PublicProfile() {
                             )
                     }
 
-
                     <h1 className="profile-name">
 
                         {
@@ -251,11 +366,14 @@ export default function PublicProfile() {
 
                     </h1>
 
-
                     <div className="profile-rating">
 
                         <span className="profile-stars">
-                            ★★★★★
+
+                            {
+                                getAverageStars()
+                            }
+
                         </span>
 
                         <span className="profile-rating-value">
@@ -267,7 +385,6 @@ export default function PublicProfile() {
                         </span>
 
                     </div>
-
 
                     <div className="profile-balance">
 
@@ -295,7 +412,6 @@ export default function PublicProfile() {
 
                     </div>
 
-
                     <p className="profile-biography">
 
                         {
@@ -305,7 +421,6 @@ export default function PublicProfile() {
                         }
 
                     </p>
-
 
                     <div className="profile-skills">
 
@@ -318,7 +433,9 @@ export default function PublicProfile() {
                                         (skill) => (
 
                                             <span
-                                                key={skill.id}
+                                                key={
+                                                    skill.id
+                                                }
                                                 className="profile-skill"
                                             >
                                                 {
@@ -343,30 +460,197 @@ export default function PublicProfile() {
 
                 </section>
 
-
                 <section className="profile-reviews">
 
-                    <h2 className="profile-reviews-title">
-                        Valoraciones de la Comunidad
-                    </h2>
+                    <div className="profile-reviews-header">
 
+                        <h2 className="profile-reviews-title">
+                            Valoraciones de la Comunidad
+                        </h2>
 
-                    <div className="profile-reviews-empty">
+                        {
+                            reviews.length > 0
+                                ? (
 
-                        <span className="profile-reviews-empty-star">
-                            ★
-                        </span>
+                                    <span className="profile-reviews-count">
 
-                        <h3>
-                            Todavía no tiene valoraciones
-                        </h3>
+                                        {
+                                            reviews.length
+                                        }
 
-                        <p>
-                            Las valoraciones que reciba después
-                            de completar intercambios aparecerán aquí.
-                        </p>
+                                        {" "}
+
+                                        {
+                                            reviews.length === 1
+                                                ? "valoración"
+                                                : "valoraciones"
+                                        }
+
+                                    </span>
+
+                                )
+                                : null
+                        }
 
                     </div>
+
+                    {
+                        reviews.length === 0
+                            ? (
+
+                                <div className="profile-reviews-empty">
+
+                                    <span className="profile-reviews-empty-star">
+                                        ★
+                                    </span>
+
+                                    <h3>
+                                        Todavía no tiene valoraciones
+                                    </h3>
+
+                                    <p>
+                                        Las valoraciones que reciba después
+                                        de completar intercambios aparecerán aquí.
+                                    </p>
+
+                                </div>
+
+                            )
+                            : (
+
+                                <div className="profile-reviews-list">
+
+                                    {
+                                        reviews.map(
+                                            (review) => (
+
+                                                <article
+                                                    key={
+                                                        review.id
+                                                    }
+                                                    className="profile-review-card"
+                                                >
+
+                                                    <div className="profile-review-header">
+
+                                                        <Link
+                                                            to={
+                                                                `/users/${review.authorId}`
+                                                            }
+                                                            className="profile-review-author"
+                                                        >
+
+                                                            {
+                                                                review.authorProfileImageUrl
+                                                                    ? (
+
+                                                                        <img
+                                                                            src={
+                                                                                review.authorProfileImageUrl
+                                                                            }
+                                                                            alt={
+                                                                                `${review.authorFirstName} ${review.authorLastName}`
+                                                                            }
+                                                                            className="profile-review-avatar"
+                                                                        />
+
+                                                                    )
+                                                                    : (
+
+                                                                        <div className="profile-review-avatar-placeholder">
+
+                                                                            {
+                                                                                getReviewAuthorInitials(
+                                                                                    review
+                                                                                )
+                                                                            }
+
+                                                                        </div>
+                                                                    )
+                                                            }
+
+                                                            <div className="profile-review-author-info">
+
+                                                                <strong>
+
+                                                                    {
+                                                                        review.authorFirstName
+                                                                    }
+
+                                                                    {" "}
+
+                                                                    {
+                                                                        review.authorLastName
+                                                                    }
+
+                                                                </strong>
+
+                                                                <span>
+
+                                                                    {
+                                                                        formatDate(
+                                                                            review.publishedAt
+                                                                        )
+                                                                    }
+
+                                                                </span>
+
+                                                            </div>
+
+                                                        </Link>
+
+                                                        <div className="profile-review-rating">
+
+                                                            <span className="profile-review-stars">
+
+                                                                {
+                                                                    getReviewStars(
+                                                                        review.rating
+                                                                    )
+                                                                }
+
+                                                            </span>
+
+                                                            <strong>
+                                                                {
+                                                                    review.rating
+                                                                }
+                                                                /5
+                                                            </strong>
+
+                                                        </div>
+
+                                                    </div>
+
+                                                    {
+                                                        review.comment
+                                                            ? (
+
+                                                                <p className="profile-review-comment">
+
+                                                                    {
+                                                                        review.comment
+                                                                    }
+
+                                                                </p>
+
+                                                            )
+                                                            : (
+
+                                                                <p className="profile-review-no-comment">
+                                                                    Sin comentario
+                                                                </p>
+                                                            )
+                                                    }
+
+                                                </article>
+                                            )
+                                        )
+                                    }
+
+                                </div>
+                            )
+                    }
 
                 </section>
 
@@ -374,4 +658,28 @@ export default function PublicProfile() {
 
         </div>
     );
+}
+
+
+async function getResponseData(
+    response
+) {
+
+    const text =
+        await response.text();
+
+    if (!text) {
+        return null;
+    }
+
+    try {
+
+        return JSON.parse(
+            text
+        );
+
+    } catch {
+
+        return text;
+    }
 }
