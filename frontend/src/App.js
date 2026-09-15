@@ -2,6 +2,7 @@ import jwt_decode
     from "jwt-decode";
 
 import {
+    Navigate,
     Route,
     Routes
 } from "react-router-dom";
@@ -48,6 +49,12 @@ import ProfileEdit
 import PublicProfile
     from "./user/profile/PublicProfile";
 
+import AdminLayout
+    from "./admin/AdminLayout";
+
+import UserListAdmin
+    from "./admin/users/UserListAdmin";
+
 import PrivateRoute
     from "./privateRoute";
 
@@ -73,21 +80,41 @@ function App() {
     }
 
 
+    const isAdmin =
+        roles.includes("ADMIN");
+
+    const isMember =
+        roles.includes("MEMBER");
+
+
     let publicRoutes = <></>;
     let userRoutes = <></>;
     let adminRoutes = <></>;
 
 
-    roles.forEach((role) => {
+    if (isAdmin) {
 
-        if (role === "ADMIN") {
+        adminRoutes = (
+            <>
 
-            adminRoutes = (
-                <>
-                </>
-            );
-        }
-    });
+                <Route
+                    path="/admin/users"
+                    element={
+                        <PrivateRoute>
+
+                            <AdminLayout activeSection="users">
+
+                                <UserListAdmin />
+
+                            </AdminLayout>
+
+                        </PrivateRoute>
+                    }
+                />
+
+            </>
+        );
+    }
 
 
     if (!jwt) {
@@ -112,17 +139,10 @@ function App() {
             </>
         );
 
-    } else {
+    } else if (isMember) {
 
         userRoutes = (
             <>
-
-                <Route
-                    path="/logout"
-                    element={
-                        <Logout />
-                    }
-                />
 
                 <Route
                     path="/listings"
@@ -268,7 +288,9 @@ function App() {
 
         <div>
 
-            <AppNavbar />
+            {!isAdmin ? (
+                <AppNavbar />
+            ) : null}
 
 
             <Routes>
@@ -277,14 +299,29 @@ function App() {
                     path="/"
                     element={
                         jwt
-                            ? (
-                                <PrivateRoute>
-                                    <Listings listingType="OFFER" />
-                                </PrivateRoute>
-                            )
+                            ? isAdmin
+                                ? (
+                                    <Navigate
+                                        to="/admin/users"
+                                        replace
+                                    />
+                                )
+                                : (
+                                    <PrivateRoute>
+                                        <Listings listingType="OFFER" />
+                                    </PrivateRoute>
+                                )
                             : (
                                 <Login />
                             )
+                    }
+                />
+
+
+                <Route
+                    path="/logout"
+                    element={
+                        <Logout />
                     }
                 />
 
