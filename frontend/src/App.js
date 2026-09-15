@@ -55,6 +55,9 @@ import AdminLayout
 import UserListAdmin
     from "./admin/users/UserListAdmin";
 
+import CategoryListAdmin
+    from "./admin/categories/CategoryListAdmin";
+
 import PrivateRoute
     from "./privateRoute";
 
@@ -105,6 +108,22 @@ function App() {
                             <AdminLayout activeSection="users">
 
                                 <UserListAdmin />
+
+                            </AdminLayout>
+
+                        </PrivateRoute>
+                    }
+                />
+
+
+                <Route
+                    path="/admin/categories"
+                    element={
+                        <PrivateRoute>
+
+                            <AdminLayout activeSection="categories">
+
+                                <CategoryListAdmin />
 
                             </AdminLayout>
 

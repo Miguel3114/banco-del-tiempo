@@ -94,7 +94,14 @@ export default function AdminLayout({
                     </Link>
 
 
-                    <span className="admin-sidebar-link admin-sidebar-link-disabled">
+                    <Link
+                        to="/admin/categories"
+                        className={
+                            activeSection === "categories"
+                                ? "admin-sidebar-link admin-sidebar-link-active"
+                                : "admin-sidebar-link"
+                        }
+                    >
 
                         <AdminIcon type="categories" />
 
@@ -102,7 +109,17 @@ export default function AdminLayout({
                             Categorías
                         </span>
 
-                    </span>
+                        {
+                            activeSection === "categories"
+                                ? (
+                                    <span className="admin-sidebar-chevron">
+                                        ›
+                                    </span>
+                                )
+                                : null
+                        }
+
+                    </Link>
 
 
                     <span className="admin-sidebar-link admin-sidebar-link-disabled">
