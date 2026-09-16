@@ -150,7 +150,14 @@ export default function AdminLayout({
                     </Link>
 
 
-                    <span className="admin-sidebar-link admin-sidebar-link-disabled">
+                    <Link
+                        to="/admin/reviews"
+                        className={
+                            activeSection === "reviews"
+                                ? "admin-sidebar-link admin-sidebar-link-active"
+                                : "admin-sidebar-link"
+                        }
+                    >
 
                         <AdminIcon type="reviews" />
 
@@ -158,7 +165,17 @@ export default function AdminLayout({
                             Valoraciones
                         </span>
 
-                    </span>
+                        {
+                            activeSection === "reviews"
+                                ? (
+                                    <span className="admin-sidebar-chevron">
+                                        ›
+                                    </span>
+                                )
+                                : null
+                        }
+
+                    </Link>
 
                 </nav>
 
