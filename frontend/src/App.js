@@ -58,6 +58,9 @@ import UserListAdmin
 import CategoryListAdmin
     from "./admin/categories/CategoryListAdmin";
 
+import ListingListAdmin
+    from "./admin/listings/ListingListAdmin";
+
 import PrivateRoute
     from "./privateRoute";
 
@@ -124,6 +127,22 @@ function App() {
                             <AdminLayout activeSection="categories">
 
                                 <CategoryListAdmin />
+
+                            </AdminLayout>
+
+                        </PrivateRoute>
+                    }
+                />
+
+
+                <Route
+                    path="/admin/listings"
+                    element={
+                        <PrivateRoute>
+
+                            <AdminLayout activeSection="listings">
+
+                                <ListingListAdmin />
 
                             </AdminLayout>
 

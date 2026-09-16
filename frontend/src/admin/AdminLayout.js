@@ -122,7 +122,14 @@ export default function AdminLayout({
                     </Link>
 
 
-                    <span className="admin-sidebar-link admin-sidebar-link-disabled">
+                    <Link
+                        to="/admin/listings"
+                        className={
+                            activeSection === "listings"
+                                ? "admin-sidebar-link admin-sidebar-link-active"
+                                : "admin-sidebar-link"
+                        }
+                    >
 
                         <AdminIcon type="listings" />
 
@@ -130,7 +137,17 @@ export default function AdminLayout({
                             Anuncios
                         </span>
 
-                    </span>
+                        {
+                            activeSection === "listings"
+                                ? (
+                                    <span className="admin-sidebar-chevron">
+                                        ›
+                                    </span>
+                                )
+                                : null
+                        }
+
+                    </Link>
 
 
                     <span className="admin-sidebar-link admin-sidebar-link-disabled">

@@ -1,0 +1,380 @@
+.admin-listings-page {
+    min-height: 100vh;
+
+    background-color: #f4f6f9;
+}
+
+
+.admin-listings-header {
+    min-height: 94px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding:
+        0 30px
+        0 38px;
+
+    border-bottom:
+        1px solid #e7eaf0;
+
+    background-color: #ffffff;
+}
+
+
+.admin-listings-header h1 {
+    margin: 0 0 4px;
+
+    color: #111827;
+
+    font-size: 20px;
+    font-weight: 700;
+}
+
+
+.admin-listings-header p {
+    margin: 0;
+
+    color: #7d8aa3;
+
+    font-size: 13px;
+}
+
+
+.admin-listing-admin-avatar {
+    width: 38px;
+    height: 38px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background-color: #eef0ff;
+
+    color: #5146f5;
+
+    font-size: 13px;
+    font-weight: 700;
+}
+
+
+.admin-listings-content {
+    padding: 34px 38px;
+}
+
+
+.admin-listings-state {
+    padding: 55px 25px;
+
+    border:
+        1px solid #e4e8ef;
+    border-radius: 11px;
+
+    background-color: #ffffff;
+
+    color: #7a8699;
+
+    font-size: 14px;
+
+    text-align: center;
+}
+
+
+.admin-listings-table-wrapper {
+    width: 100%;
+
+    overflow-x: auto;
+
+    border:
+        1px solid #e1e5eb;
+    border-radius: 12px;
+
+    background-color: #ffffff;
+
+    box-shadow:
+        0 2px 5px
+        rgba(15, 23, 42, 0.06);
+}
+
+
+.admin-listings-table {
+    width: 100%;
+    min-width: 900px;
+
+    border-collapse: collapse;
+}
+
+
+.admin-listings-table thead {
+    background-color: #f1f3f6;
+}
+
+
+.admin-listings-table th {
+    height: 48px;
+
+    padding: 0 25px;
+
+    color: #60708b;
+
+    font-size: 12px;
+    font-weight: 600;
+
+    text-align: left;
+    text-transform: uppercase;
+
+    vertical-align: middle;
+}
+
+
+.admin-listings-table td {
+    height: 72px;
+
+    padding: 0 25px;
+
+    border-bottom:
+        1px solid #e7eaf0;
+
+    color: #111827;
+
+    font-size: 13px;
+
+    vertical-align: middle;
+}
+
+
+.admin-listings-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+
+.admin-listing-id {
+    color: #63728b !important;
+
+    font-family:
+        Consolas,
+        "Courier New",
+        monospace;
+
+    font-size: 12px !important;
+}
+
+
+.admin-listing-title {
+    max-width: 270px;
+
+    font-size: 14px !important;
+    font-weight: 500;
+}
+
+
+.admin-listing-category {
+    display: inline-flex;
+    align-items: center;
+
+    min-height: 27px;
+
+    padding: 4px 10px;
+
+    border-radius: 6px;
+
+    background-color: #f0f3f7;
+
+    color: #44546a;
+
+    font-size: 12px;
+    font-weight: 500;
+}
+
+
+.admin-listing-type {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-width: 72px;
+
+    padding: 5px 10px;
+
+    border-radius: 20px;
+
+    font-size: 11px;
+    font-weight: 600;
+}
+
+
+.admin-listing-type-offer {
+    background-color: #e8f8f0;
+
+    color: #07875f;
+}
+
+
+.admin-listing-type-request {
+    background-color: #eef0ff;
+
+    color: #5146f5;
+}
+
+
+.admin-listing-author {
+    color: #52627a !important;
+}
+
+
+.admin-listing-delete-button {
+    padding: 4px 0;
+
+    border: none;
+
+    background-color: transparent;
+
+    color: #dc3545;
+
+    font-size: 13px;
+    font-weight: 500;
+
+    cursor: pointer;
+}
+
+
+.admin-listing-delete-button:hover {
+    color: #b42331;
+}
+
+
+.admin-listing-delete-modal .modal-content {
+    overflow: hidden;
+
+    border: none;
+    border-radius: 12px;
+
+    box-shadow:
+        0 20px 45px
+        rgba(15, 23, 42, 0.2);
+}
+
+
+.admin-listing-delete-text {
+    margin-bottom: 18px;
+
+    color: #334155;
+
+    font-size: 14px;
+}
+
+
+.admin-listing-delete-info {
+    display: flex;
+    flex-direction: column;
+
+    gap: 4px;
+
+    padding: 14px;
+
+    border-radius: 8px;
+
+    background-color: #f5f7fa;
+}
+
+
+.admin-listing-delete-info strong {
+    color: #172033;
+
+    font-size: 14px;
+}
+
+
+.admin-listing-delete-info span {
+    color: #75839a;
+
+    font-size: 12px;
+}
+
+
+.admin-listing-cancel-button,
+.admin-listing-confirm-delete-button {
+    min-height: 38px;
+
+    padding: 0 17px;
+
+    border-radius: 7px;
+
+    font-size: 12px;
+    font-weight: 600;
+
+    cursor: pointer;
+}
+
+
+.admin-listing-cancel-button {
+    border:
+        1px solid #d8dee8;
+
+    background-color: #ffffff;
+
+    color: #243047;
+}
+
+
+.admin-listing-confirm-delete-button {
+    border:
+        1px solid #dc3545;
+
+    background-color: #dc3545;
+
+    color: #ffffff;
+}
+
+
+.admin-listing-confirm-delete-button:hover {
+    background-color: #c52f3d;
+}
+
+
+.admin-listing-cancel-button:disabled,
+.admin-listing-confirm-delete-button:disabled {
+    cursor: not-allowed;
+
+    opacity: 0.6;
+}
+
+
+@media (max-width: 900px) {
+
+    .admin-listings-header {
+        padding-left: 24px;
+        padding-right: 24px;
+    }
+
+
+    .admin-listings-content {
+        padding:
+            25px 24px;
+    }
+}
+
+
+@media (max-width: 700px) {
+
+    .admin-listings-header {
+        min-height: 82px;
+
+        padding-left: 18px;
+        padding-right: 18px;
+    }
+
+
+    .admin-listings-header h1 {
+        font-size: 18px;
+    }
+
+
+    .admin-listings-content {
+        padding:
+            20px 18px;
+    }
+}
