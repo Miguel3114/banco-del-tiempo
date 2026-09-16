@@ -25,10 +25,7 @@ public class AdminUserDTO {
         this.firstName = user.getFirstName();
         this.lastName = user.getLastName();
         this.email = user.getEmail();
-        this.profileImageUrl = user.getProfileImageUrl();
-        this.registeredAt = user.getRegisteredAt();
         this.hourBalance = user.getHourBalance();
-        this.averageRating = user.getAverageRating();
         this.accountStatus = user.getAccountStatus();
     }
 }
