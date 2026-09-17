@@ -59,4 +59,11 @@ public interface ListingRepository extends CrudRepository<Listing, Integer> {
                         ORDER BY l.publishedAt DESC
                         """)
         List<Listing> findAdminListings(@Param("status") ListingStatus status);
+
+        @Query("""
+                        SELECT COUNT(l)
+                        FROM Listing l
+                        WHERE l.listingStatus = :status
+                        """)
+        long countByStatus(@Param("status") ListingStatus status);
 }

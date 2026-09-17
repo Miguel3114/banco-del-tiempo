@@ -15,4 +15,7 @@ public interface UserRepository extends CrudRepository<User, Integer> {
 
     @Query("SELECT u FROM User u WHERE u.role = :role ORDER BY u.registeredAt DESC")
     List<User> findUsers(@Param("role") Role role);
+
+    @Query("SELECT COUNT(u) FROM User u WHERE u.role = :role")
+    long countByRole(@Param("role") Role role);
 }
