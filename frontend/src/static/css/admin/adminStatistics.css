@@ -1,0 +1,238 @@
+.admin-statistics-page {
+    min-height: 100vh;
+
+    background-color: #f4f6f9;
+}
+
+
+.admin-statistics-header {
+    min-height: 94px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding:
+        0 30px
+        0 38px;
+
+    border-bottom:
+        1px solid #e7eaf0;
+
+    background-color: #ffffff;
+}
+
+
+.admin-statistics-header h1 {
+    margin: 0 0 4px;
+
+    color: #111827;
+
+    font-size: 20px;
+    font-weight: 700;
+}
+
+
+.admin-statistics-header p {
+    margin: 0;
+
+    color: #7d8aa3;
+
+    font-size: 13px;
+}
+
+
+.admin-statistics-admin-avatar {
+    width: 38px;
+    height: 38px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background-color: #eef0ff;
+
+    color: #5146f5;
+
+    font-size: 13px;
+    font-weight: 700;
+}
+
+
+.admin-statistics-content {
+    padding: 34px 38px;
+}
+
+
+.admin-statistics-state {
+    padding: 55px 25px;
+
+    border:
+        1px solid #e4e8ef;
+
+    border-radius: 11px;
+
+    background-color: #ffffff;
+
+    color: #7a8699;
+
+    font-size: 14px;
+
+    text-align: center;
+}
+
+
+.admin-statistics-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+
+    gap: 24px;
+}
+
+
+.admin-statistics-card {
+    min-height: 190px;
+
+    display: flex;
+    align-items: flex-start;
+
+    gap: 20px;
+
+    padding: 28px;
+
+    border:
+        1px solid #e1e5eb;
+
+    border-radius: 12px;
+
+    background-color: #ffffff;
+
+    box-shadow:
+        0 2px 5px
+        rgba(15, 23, 42, 0.06);
+}
+
+
+.admin-statistics-icon {
+    width: 52px;
+    height: 52px;
+
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 12px;
+}
+
+
+.admin-statistics-icon svg {
+    width: 25px;
+    height: 25px;
+
+    fill: none;
+
+    stroke: currentColor;
+
+    stroke-width: 1.8;
+
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+
+.admin-statistics-users-icon {
+    background-color: #eef0ff;
+
+    color: #5146f5;
+}
+
+
+.admin-statistics-listings-icon {
+    background-color: #eaf8ef;
+
+    color: #299456;
+}
+
+
+.admin-statistics-hours-icon {
+    background-color: #fff5df;
+
+    color: #cf8a17;
+}
+
+
+.admin-statistics-card-content {
+    min-width: 0;
+}
+
+
+.admin-statistics-card-label {
+    display: block;
+
+    margin-bottom: 12px;
+
+    color: #68758b;
+
+    font-size: 13px;
+    font-weight: 600;
+}
+
+
+.admin-statistics-card-content strong {
+    display: block;
+
+    margin-bottom: 12px;
+
+    color: #111827;
+
+    font-size: 36px;
+    font-weight: 700;
+
+    line-height: 1;
+}
+
+
+.admin-statistics-card-content p {
+    margin: 0;
+
+    color: #8995a8;
+
+    font-size: 12px;
+
+    line-height: 1.45;
+}
+
+
+@media (max-width: 1100px) {
+
+    .admin-statistics-grid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+}
+
+
+@media (max-width: 750px) {
+
+    .admin-statistics-header {
+        padding-left: 24px;
+        padding-right: 24px;
+    }
+
+
+    .admin-statistics-content {
+        padding:
+            25px 24px;
+    }
+
+
+    .admin-statistics-grid {
+        grid-template-columns: 1fr;
+    }
+}

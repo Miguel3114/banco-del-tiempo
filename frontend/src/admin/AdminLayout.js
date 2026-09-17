@@ -55,7 +55,14 @@ export default function AdminLayout({
 
                 <nav className="admin-sidebar-menu">
 
-                    <span className="admin-sidebar-link admin-sidebar-link-disabled">
+                    <Link
+                        to="/admin/statistics"
+                        className={
+                            activeSection === "statistics"
+                                ? "admin-sidebar-link admin-sidebar-link-active"
+                                : "admin-sidebar-link"
+                        }
+                    >
 
                         <AdminIcon type="statistics" />
 
@@ -63,7 +70,17 @@ export default function AdminLayout({
                             Estadísticas
                         </span>
 
-                    </span>
+                        {
+                            activeSection === "statistics"
+                                ? (
+                                    <span className="admin-sidebar-chevron">
+                                        ›
+                                    </span>
+                                )
+                                : null
+                        }
+
+                    </Link>
 
 
                     <Link

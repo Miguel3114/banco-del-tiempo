@@ -106,7 +106,7 @@ export default function Login() {
                         data.roles?.includes(
                             "ADMIN"
                         )
-                            ? "/admin/users"
+                            ? "/admin/statistics"
                             : "/listings";
                 }
             )

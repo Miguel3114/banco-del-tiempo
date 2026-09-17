@@ -52,6 +52,9 @@ import PublicProfile
 import AdminLayout
     from "./admin/AdminLayout";
 
+import StatisticsAdmin
+    from "./admin/statistics/StatisticsAdmin";
+
 import UserListAdmin
     from "./admin/users/UserListAdmin";
 
@@ -105,6 +108,22 @@ function App() {
 
         adminRoutes = (
             <>
+
+                <Route
+                    path="/admin/statistics"
+                    element={
+                        <PrivateRoute>
+
+                            <AdminLayout activeSection="statistics">
+
+                                <StatisticsAdmin />
+
+                            </AdminLayout>
+
+                        </PrivateRoute>
+                    }
+                />
+
 
                 <Route
                     path="/admin/users"
@@ -359,7 +378,7 @@ function App() {
                             ? isAdmin
                                 ? (
                                     <Navigate
-                                        to="/admin/users"
+                                        to="/admin/statistics"
                                         replace
                                     />
                                 )
