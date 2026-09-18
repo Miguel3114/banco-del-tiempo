@@ -91,6 +91,7 @@ export default function Login() {
                         return;
                     }
 
+
                     tokenService.setUser(
                         data
                     );
@@ -100,8 +101,13 @@ export default function Login() {
                             data.token
                         );
 
+
                     window.location.href =
-                        "/listings";
+                        data.roles?.includes(
+                            "ADMIN"
+                        )
+                            ? "/admin/statistics"
+                            : "/listings";
                 }
             )
 

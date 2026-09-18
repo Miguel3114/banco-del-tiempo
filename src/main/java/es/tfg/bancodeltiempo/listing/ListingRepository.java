@@ -44,4 +44,26 @@ public interface ListingRepository extends CrudRepository<Listing, Integer> {
                         """)
         boolean hasListings(@Param("categoryId") Integer categoryId,
                         @Param("status") ListingStatus status);
+
+        @Query("""
+                        SELECT COUNT(l)
+                        FROM Listing l
+                        WHERE l.category.id = :categoryId
+                        """)
+        long countByCategory(@Param("categoryId") Integer categoryId);
+
+        @Query("""
+                        SELECT l
+                        FROM Listing l
+                        WHERE l.listingStatus = :status
+                        ORDER BY l.publishedAt DESC
+                        """)
+        List<Listing> findAdminListings(@Param("status") ListingStatus status);
+
+        @Query("""
+                        SELECT COUNT(l)
+                        FROM Listing l
+                        WHERE l.listingStatus = :status
+                        """)
+        long countByStatus(@Param("status") ListingStatus status);
 }

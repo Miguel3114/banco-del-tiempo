@@ -1,0 +1,342 @@
+.admin-users-page {
+    min-height: 100vh;
+
+    background-color: #ffffff;
+}
+
+
+.admin-users-header {
+    min-height: 94px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding:
+        0 30px
+        0 38px;
+
+    border-bottom:
+        1px solid #e7eaf0;
+}
+
+
+.admin-users-header h1 {
+    margin: 0 0 4px;
+
+    color: #111827;
+
+    font-size: 20px;
+    font-weight: 700;
+}
+
+
+.admin-users-header p {
+    margin: 0;
+
+    color: #7d8aa3;
+
+    font-size: 13px;
+}
+
+
+.admin-user-admin-avatar {
+    width: 38px;
+    height: 38px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background-color: #eef0ff;
+
+    color: #5146f5;
+
+    font-size: 13px;
+    font-weight: 700;
+}
+
+
+.admin-users-alert-container {
+    padding:
+        18px 38px
+        0;
+}
+
+
+.admin-users-state {
+    padding: 55px 38px;
+
+    color: #7a8699;
+
+    font-size: 14px;
+}
+
+
+.admin-users-table-wrapper {
+    width: 100%;
+
+    overflow-x: auto;
+}
+
+
+.admin-users-table {
+    width: 100%;
+    min-width: 850px;
+
+    border-collapse: collapse;
+}
+
+
+.admin-users-table thead {
+    background-color: #f3f5f8;
+}
+
+
+.admin-users-table th {
+    height: 49px;
+
+    padding: 0 38px;
+
+    color: #65758e;
+
+    font-size: 12px;
+    font-weight: 600;
+
+    text-align: left;
+    text-transform: uppercase;
+
+    vertical-align: middle;
+}
+
+
+.admin-users-table td {
+    height: 76px;
+
+    padding: 0 38px;
+
+    border-bottom:
+        1px solid #e7eaf0;
+
+    color: #111827;
+
+    font-size: 13px;
+
+    vertical-align: middle;
+}
+
+
+.admin-user-id,
+.admin-user-email {
+    color: #63728b !important;
+
+    font-family:
+        Consolas,
+        "Courier New",
+        monospace;
+
+    font-size: 12px !important;
+}
+
+
+.admin-user-name-cell {
+    display: flex;
+    align-items: center;
+
+    gap: 14px;
+
+    font-size: 15px;
+    font-weight: 500;
+
+    white-space: nowrap;
+}
+
+
+.admin-user-avatar {
+    width: 37px;
+    height: 37px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    flex-shrink: 0;
+
+    border-radius: 50%;
+
+    background-color: #7565ff;
+
+    color: #ffffff;
+
+    font-size: 13px;
+    font-weight: 600;
+}
+
+
+.admin-user-balance {
+    min-width: 42px;
+    min-height: 28px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 4px 9px;
+
+    border-radius: 6px;
+
+    background-color: #f1f4f8;
+
+    color: #334155;
+
+    font-size: 12px;
+    font-weight: 600;
+}
+
+
+.admin-user-status-cell {
+    display: flex;
+    align-items: center;
+
+    gap: 12px;
+
+    white-space: nowrap;
+}
+
+
+.admin-user-switch {
+    width: 52px;
+    height: 28px;
+
+    position: relative;
+
+    flex-shrink: 0;
+
+    margin: 0;
+}
+
+
+.admin-user-switch input {
+    width: 0;
+    height: 0;
+
+    opacity: 0;
+}
+
+
+.admin-user-switch-slider {
+    position: absolute;
+
+    inset: 0;
+
+    border-radius: 20px;
+
+    background-color: #cbd7e6;
+
+    cursor: pointer;
+
+    transition: 0.2s;
+}
+
+
+.admin-user-switch-slider::before {
+    content: "";
+
+    width: 22px;
+    height: 22px;
+
+    position: absolute;
+
+    top: 3px;
+    left: 3px;
+
+    border-radius: 50%;
+
+    background-color: #ffffff;
+
+    box-shadow:
+        0 1px 4px
+        rgba(15, 23, 42, 0.2);
+
+    transition: 0.2s;
+}
+
+
+.admin-user-switch input:checked +
+.admin-user-switch-slider {
+    background-color: #10b981;
+}
+
+
+.admin-user-switch input:checked +
+.admin-user-switch-slider::before {
+    transform:
+        translateX(24px);
+}
+
+
+.admin-user-switch input:disabled +
+.admin-user-switch-slider {
+    cursor: wait;
+
+    opacity: 0.65;
+}
+
+
+.admin-user-status-text {
+    min-width: 82px;
+
+    font-size: 13px;
+    font-weight: 500;
+}
+
+
+.admin-user-status-active {
+    color: #059669;
+}
+
+
+.admin-user-status-blocked {
+    color: #8a9ab5;
+}
+
+
+@media (max-width: 900px) {
+
+    .admin-users-header {
+        padding-left: 24px;
+        padding-right: 24px;
+    }
+
+
+    .admin-users-table th,
+    .admin-users-table td {
+        padding-left: 24px;
+        padding-right: 24px;
+    }
+}
+
+
+@media (max-width: 700px) {
+
+    .admin-users-header {
+        min-height: 82px;
+
+        padding-left: 18px;
+        padding-right: 18px;
+    }
+
+
+    .admin-users-header h1 {
+        font-size: 18px;
+    }
+
+
+    .admin-users-table th,
+    .admin-users-table td {
+        padding-left: 18px;
+        padding-right: 18px;
+    }
+}

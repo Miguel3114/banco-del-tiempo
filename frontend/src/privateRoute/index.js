@@ -8,7 +8,10 @@ import Login from "../auth/login";
 import tokenService
     from "../services/token.service";
 
-const PrivateRoute = ({ children }) => {
+
+const PrivateRoute = ({
+    children
+}) => {
 
     const jwt =
         tokenService.getLocalAccessToken();
@@ -19,59 +22,123 @@ const PrivateRoute = ({ children }) => {
     const [isValid, setIsValid] =
         useState(false);
 
+
     useEffect(() => {
 
-        if (!jwt) {
+        let active =
+            true;
 
-            setIsLoading(false);
-            setIsValid(false);
+        let intervalId;
 
-            return;
-        }
 
-        fetch(
-            `/api/auth/validate?token=${encodeURIComponent(jwt)}`,
-            {
-                method: "GET",
+        async function validateSession() {
 
-                headers: {
-                    "Accept":
-                        "application/json",
+            const currentJwt =
+                tokenService.getLocalAccessToken();
 
-                    "Content-Type":
-                        "application/json"
+            if (!currentJwt) {
+
+                if (active) {
+                    setIsValid(false);
+                    setIsLoading(false);
                 }
+
+                return;
             }
-        )
-            .then((response) =>
-                response.json()
-            )
 
-            .then((valid) => {
 
-                setIsValid(valid);
+            try {
+
+                const response =
+                    await fetch(
+                        `/api/auth/validate?token=${encodeURIComponent(currentJwt)}`,
+                        {
+                            method: "GET",
+
+                            headers: {
+                                Accept:
+                                    "application/json",
+
+                                "Content-Type":
+                                    "application/json"
+                            }
+                        }
+                    );
+
+                const valid =
+                    response.ok
+                        ? await response.json()
+                        : false;
+
+
+                if (!active) {
+                    return;
+                }
+
+
+                if (!valid) {
+
+                    tokenService.removeUser();
+
+                    window.location.href =
+                        "/login";
+
+                    return;
+                }
+
+
+                setIsValid(true);
                 setIsLoading(false);
-            })
 
-            .catch(() => {
+            } catch {
+
+                if (!active) {
+                    return;
+                }
 
                 setIsValid(false);
                 setIsLoading(false);
-            });
+            }
+        }
+
+
+        validateSession();
+
+
+        intervalId =
+            setInterval(
+                validateSession,
+                10000
+            );
+
+
+        return () => {
+
+            active =
+                false;
+
+            clearInterval(
+                intervalId
+            );
+        };
 
     }, [jwt]);
+
 
     if (!jwt) {
         return <Login />;
     }
 
+
     if (isLoading) {
         return <div>Cargando...</div>;
     }
+
 
     return isValid
         ? children
         : <Login />;
 };
+
 
 export default PrivateRoute;

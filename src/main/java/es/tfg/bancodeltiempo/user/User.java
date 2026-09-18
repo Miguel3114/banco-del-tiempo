@@ -1,6 +1,5 @@
 package es.tfg.bancodeltiempo.user;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
@@ -59,12 +58,6 @@ public class User {
 
     @Column(name = "profile_image_url", length = 255)
     private String profileImageUrl;
-
-    @Column(name = "hour_balance", nullable = false)
-    private Integer hourBalance = 0;
-
-    @Column(name = "average_rating", precision = 3, scale = 2)
-    private BigDecimal averageRating;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "account_status", nullable = false, length = 20)

@@ -25,48 +25,43 @@ import es.tfg.bancodeltiempo.auth.payload.response.JwtResponse;
 import es.tfg.bancodeltiempo.auth.payload.response.MessageResponse;
 import es.tfg.bancodeltiempo.configuration.jwt.JwtUtils;
 import es.tfg.bancodeltiempo.configuration.services.UserDetailsImpl;
+import es.tfg.bancodeltiempo.configuration.services.UserDetailsServiceImpl;
 import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
 
-    private final AuthenticationManager
-        authenticationManager;
+    private final AuthenticationManager authenticationManager;
 
     private final JwtUtils jwtUtils;
 
     private final AuthService authService;
 
+    private final UserDetailsServiceImpl userDetailsService;
+
     @Autowired
-    public AuthController(
-            AuthenticationManager authenticationManager,
-            JwtUtils jwtUtils,
-            AuthService authService) {
+    public AuthController(AuthenticationManager authenticationManager,
+            JwtUtils jwtUtils, AuthService authService,
+            UserDetailsServiceImpl userDetailsService) {
 
-        this.authenticationManager =
-            authenticationManager;
-
+        this.authenticationManager = authenticationManager;
         this.jwtUtils = jwtUtils;
-
         this.authService = authService;
+        this.userDetailsService = userDetailsService;
     }
 
     @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(
-            @Valid
-            @RequestBody
-            LoginRequest loginRequest) {
+            @Valid @RequestBody LoginRequest loginRequest) {
 
         try {
 
-            String email =
-                loginRequest.getEmail()
+            String email = loginRequest.getEmail()
                     .trim()
                     .toLowerCase(Locale.ROOT);
 
-            Authentication authentication =
-                this.authenticationManager
+            Authentication authentication = this.authenticationManager
                     .authenticate(
                         new UsernamePasswordAuthenticationToken(
                             email,
@@ -75,56 +70,51 @@ public class AuthController {
                     );
 
             SecurityContextHolder
-                .getContext()
-                .setAuthentication(authentication);
+                    .getContext()
+                    .setAuthentication(authentication);
 
-            String jwt =
-                this.jwtUtils
+            String jwt = this.jwtUtils
                     .generateJwtToken(authentication);
 
             UserDetailsImpl userDetails =
-                (UserDetailsImpl)
-                    authentication.getPrincipal();
+                    (UserDetailsImpl) authentication.getPrincipal();
 
-            List<String> roles =
-                userDetails
+            List<String> roles = userDetails
                     .getAuthorities()
                     .stream()
-                    .map(item ->
-                        item.getAuthority()
-                    )
+                    .map(item -> item.getAuthority())
                     .collect(Collectors.toList());
 
             return ResponseEntity
-                .ok()
-                .body(
-                    new JwtResponse(
-                        jwt,
-                        userDetails.getId(),
-                        userDetails.getUsername(),
-                        roles
-                    )
-                );
+                    .ok()
+                    .body(
+                        new JwtResponse(
+                            jwt,
+                            userDetails.getId(),
+                            userDetails.getUsername(),
+                            roles
+                        )
+                    );
 
         } catch (LockedException exception) {
 
             return ResponseEntity
-                .badRequest()
-                .body(
-                    new MessageResponse(
-                        "Error: La cuenta está bloqueada"
-                    )
-                );
+                    .badRequest()
+                    .body(
+                        new MessageResponse(
+                            "Error: La cuenta está bloqueada"
+                        )
+                    );
 
         } catch (BadCredentialsException exception) {
 
             return ResponseEntity
-                .badRequest()
-                .body(
-                    new MessageResponse(
-                        "Error: Credenciales incorrectas"
-                    )
-                );
+                    .badRequest()
+                    .body(
+                        new MessageResponse(
+                            "Error: Credenciales incorrectas"
+                        )
+                    );
         }
     }
 
@@ -132,30 +122,47 @@ public class AuthController {
     public ResponseEntity<Boolean> validateToken(
             @RequestParam String token) {
 
-        Boolean isValid =
-            this.jwtUtils.validateJwtToken(token);
+        if (!this.jwtUtils.validateJwtToken(token)) {
+            return ResponseEntity.ok(false);
+        }
 
-        return ResponseEntity.ok(isValid);
+        try {
+
+            String email = this.jwtUtils
+                    .getUserNameFromJwtToken(token);
+
+            UserDetailsImpl userDetails =
+                    (UserDetailsImpl) this.userDetailsService
+                            .loadUserByUsername(email);
+
+            Boolean isValid =
+                    userDetails.isAccountNonLocked() &&
+                    userDetails.isAccountNonExpired() &&
+                    userDetails.isCredentialsNonExpired() &&
+                    userDetails.isEnabled();
+
+            return ResponseEntity.ok(isValid);
+
+        } catch (Exception exception) {
+
+            return ResponseEntity.ok(false);
+        }
     }
 
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(
-            @Valid
-            @RequestBody
-            UserRegisterRequest registerRequest) {
+            @Valid @RequestBody UserRegisterRequest registerRequest) {
 
         try {
 
             this.authService
-                .createMemberUser(registerRequest);
+                    .createMemberUser(registerRequest);
 
-            String email =
-                registerRequest.getEmail()
+            String email = registerRequest.getEmail()
                     .trim()
                     .toLowerCase(Locale.ROOT);
 
-            Authentication authentication =
-                this.authenticationManager
+            Authentication authentication = this.authenticationManager
                     .authenticate(
                         new UsernamePasswordAuthenticationToken(
                             email,
@@ -164,47 +171,42 @@ public class AuthController {
                     );
 
             SecurityContextHolder
-                .getContext()
-                .setAuthentication(authentication);
+                    .getContext()
+                    .setAuthentication(authentication);
 
-            String jwt =
-                this.jwtUtils
+            String jwt = this.jwtUtils
                     .generateJwtToken(authentication);
 
             UserDetailsImpl userDetails =
-                (UserDetailsImpl)
-                    authentication.getPrincipal();
+                    (UserDetailsImpl) authentication.getPrincipal();
 
-            List<String> roles =
-                userDetails
+            List<String> roles = userDetails
                     .getAuthorities()
                     .stream()
-                    .map(item ->
-                        item.getAuthority()
-                    )
+                    .map(item -> item.getAuthority())
                     .collect(Collectors.toList());
 
             return ResponseEntity
-                .ok()
-                .body(
-                    new JwtResponse(
-                        jwt,
-                        userDetails.getId(),
-                        userDetails.getUsername(),
-                        roles
-                    )
-                );
+                    .ok()
+                    .body(
+                        new JwtResponse(
+                            jwt,
+                            userDetails.getId(),
+                            userDetails.getUsername(),
+                            roles
+                        )
+                    );
 
         } catch (IllegalArgumentException exception) {
 
             return ResponseEntity
-                .badRequest()
-                .body(
-                    new MessageResponse(
-                        "Error: "
-                        + exception.getMessage()
-                    )
-                );
+                    .badRequest()
+                    .body(
+                        new MessageResponse(
+                            "Error: "
+                            + exception.getMessage()
+                        )
+                    );
         }
     }
 }

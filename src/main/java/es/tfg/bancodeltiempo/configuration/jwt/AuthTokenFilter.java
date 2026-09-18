@@ -34,7 +34,8 @@ public class AuthTokenFilter
 
         try {
 
-            String jwt = this.parseJwt(request);
+            String jwt =
+                this.parseJwt(request);
 
             if (jwt != null
                     && this.jwtUtils.validateJwtToken(jwt)) {
@@ -47,22 +48,30 @@ public class AuthTokenFilter
                     this.userDetailsService
                         .loadUserByUsername(email);
 
-                UsernamePasswordAuthenticationToken
-                    authentication =
-                        new UsernamePasswordAuthenticationToken(
-                            userDetails,
-                            null,
-                            userDetails.getAuthorities()
-                        );
+                if (
+                    userDetails.isAccountNonLocked() &&
+                    userDetails.isAccountNonExpired() &&
+                    userDetails.isCredentialsNonExpired() &&
+                    userDetails.isEnabled()
+                ) {
 
-                authentication.setDetails(
-                    new WebAuthenticationDetailsSource()
-                        .buildDetails(request)
-                );
+                    UsernamePasswordAuthenticationToken
+                        authentication =
+                            new UsernamePasswordAuthenticationToken(
+                                userDetails,
+                                null,
+                                userDetails.getAuthorities()
+                            );
 
-                SecurityContextHolder
-                    .getContext()
-                    .setAuthentication(authentication);
+                    authentication.setDetails(
+                        new WebAuthenticationDetailsSource()
+                            .buildDetails(request)
+                    );
+
+                    SecurityContextHolder
+                        .getContext()
+                        .setAuthentication(authentication);
+                }
             }
 
         } catch (Exception e) {
@@ -73,21 +82,31 @@ public class AuthTokenFilter
             );
         }
 
-        filterChain.doFilter(request, response);
+        filterChain.doFilter(
+            request,
+            response
+        );
     }
 
     private String parseJwt(
             HttpServletRequest request) {
 
         String headerAuth =
-            request.getHeader("Authorization");
+            request.getHeader(
+                "Authorization"
+            );
 
-        if (StringUtils.hasText(headerAuth)
-                && headerAuth.startsWith("Bearer ")) {
+        if (
+            StringUtils.hasText(
+                headerAuth
+            ) &&
+            headerAuth.startsWith(
+                "Bearer "
+            )
+        ) {
 
             return headerAuth.substring(
-                7,
-                headerAuth.length()
+                7
             );
         }
 
