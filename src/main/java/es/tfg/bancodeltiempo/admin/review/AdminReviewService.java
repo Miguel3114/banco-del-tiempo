@@ -1,7 +1,5 @@
 package es.tfg.bancodeltiempo.admin.review;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,25 +40,7 @@ public class AdminReviewService {
         Review review = this.reviewRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Valoración", "id", id));
 
-        User reviewedUser = review.getReviewedUser();
-
         this.reviewRepository.delete(review);
-
-        this.updateAverageRating(reviewedUser);
-    }
-
-    private void updateAverageRating(User user) {
-        Double average = this.reviewRepository.findAverageRating(user.getId());
-
-        if (average == null) {
-            user.setAverageRating(null);
-        } else {
-            user.setAverageRating(
-                    BigDecimal.valueOf(average)
-                            .setScale(2, RoundingMode.HALF_UP));
-        }
-
-        this.userService.saveUser(user);
     }
 
     private void checkAdmin() {

@@ -82,6 +82,16 @@ public class ExchangeService {
                 ExchangeStatus.ACCEPTED);
     }
 
+    @Transactional(readOnly = true)
+    public Integer findHourBalance(Integer userId) {
+        return this.exchangeRepository.findHourBalance(
+                userId,
+                ExchangeStatus.ACCEPTED,
+                ListingType.OFFER,
+                ListingType.REQUEST)
+                .intValue();
+    }
+
     @Transactional
     public Exchange createExchange(Integer chatId, ExchangeCreateRequest request) {
         Chat chat = this.chatService.findChat(chatId);
@@ -120,7 +130,6 @@ public class ExchangeService {
     public Exchange acceptExchange(Integer id) {
         Exchange exchange = this.findExchange(id);
         User currentUser = this.userService.findCurrentUser();
-        User provider = this.findProvider(exchange.getChat());
         User receiver = this.findReceiver(exchange.getChat());
 
         this.checkParticipant(exchange.getChat(), currentUser);
@@ -133,15 +142,6 @@ public class ExchangeService {
             throw new ConflictException("El intercambio ya no está pendiente");
         }
 
-        receiver.setHourBalance(
-                receiver.getHourBalance() - exchange.getHours());
-
-        provider.setHourBalance(
-                provider.getHourBalance() + exchange.getHours());
-
-        this.userService.saveUser(receiver);
-        this.userService.saveUser(provider);
-
         exchange.setStatus(ExchangeStatus.ACCEPTED);
 
         Exchange savedExchange = this.exchangeRepository.save(exchange);
@@ -149,7 +149,7 @@ public class ExchangeService {
         this.messageService.createSystemMessage(
                 exchange.getChat(),
                 "El intercambio de " + this.formatHours(exchange.getHours())
-                        + " ha sido aceptado. Los saldos se han actualizado correctamente.");
+                        + " ha sido aceptado correctamente.");
 
         return savedExchange;
     }

@@ -92,10 +92,6 @@ public class BancoDelTiempoInitializer
                 AccountStatus.ACTIVE
             );
 
-            admin.setHourBalance(
-                0
-            );
-
             this.userService.saveUser(
                 admin
             );

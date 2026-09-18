@@ -44,6 +44,18 @@ public class ReviewService {
         return this.reviewRepository.countReview(exchangeId, authorId) > 0;
     }
 
+    @Transactional(readOnly = true)
+    public BigDecimal findAverageRating(Integer userId) {
+        Double average = this.reviewRepository.findAverageRating(userId);
+
+        if (average == null) {
+            return null;
+        }
+
+        return BigDecimal.valueOf(average)
+                .setScale(2, RoundingMode.HALF_UP);
+    }
+
     @Transactional
     public Review createReview(Integer exchangeId, ReviewCreateRequest request) {
         Exchange exchange = this.exchangeService.findExchange(exchangeId);
@@ -85,24 +97,6 @@ public class ReviewService {
             review.setComment(null);
         }
 
-        Review savedReview = this.reviewRepository.save(review);
-
-        this.updateAverageRating(reviewedUser);
-
-        return savedReview;
-    }
-
-    private void updateAverageRating(User user) {
-        Double average = this.reviewRepository.findAverageRating(user.getId());
-
-        if (average == null) {
-            user.setAverageRating(null);
-        } else {
-            user.setAverageRating(
-                    BigDecimal.valueOf(average)
-                            .setScale(2, RoundingMode.HALF_UP));
-        }
-
-        this.userService.saveUser(user);
+        return this.reviewRepository.save(review);
     }
 }
