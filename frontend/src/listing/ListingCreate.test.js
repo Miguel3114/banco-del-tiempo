@@ -284,3 +284,122 @@ describe("ListingCreate", () => {
         }
     );
 });
+
+describe("ListingCreate additional coverage", () => {
+
+    beforeEach(() => {
+        localStorage.setItem("jwt", JSON.stringify("test-token"));
+        global.fetch = jest.fn();
+    });
+
+    afterEach(() => {
+        jest.resetAllMocks();
+        localStorage.clear();
+    });
+
+    function categoriesResponse() {
+        return {
+            ok: true,
+            json: async () => [
+                { id: 1, name: "Informática" }
+            ]
+        };
+    }
+
+    function fillListing() {
+        fireEvent.change(
+            screen.getByLabelText(/Título:/i),
+            { target: { value: "Ayuda con Java" } }
+        );
+        fireEvent.change(
+            screen.getByLabelText(/Categoría:/i),
+            { target: { value: "1" } }
+        );
+        fireEvent.change(
+            screen.getByLabelText(/Horas estimadas:/i),
+            { target: { value: "2" } }
+        );
+        fireEvent.change(
+            screen.getByLabelText(/Descripción:/i),
+            { target: { value: "Necesito ayuda con Java" } }
+        );
+    }
+
+    test("shouldShowCategoriesLoadError", async () => {
+        global.fetch.mockResolvedValue({
+            ok: false,
+            json: async () => ({
+                message: "No hay categorías"
+            })
+        });
+
+        render(
+            <MemoryRouter>
+                <ListingCreate listingType="OFFER" />
+            </MemoryRouter>
+        );
+
+        expect(
+            await screen.findByText("No hay categorías")
+        ).toBeInTheDocument();
+    });
+
+    test("shouldCreateDemand", async () => {
+        global.fetch
+            .mockResolvedValueOnce(categoriesResponse())
+            .mockResolvedValueOnce({
+                ok: true,
+                json: async () => ({ id: 10 })
+            });
+
+        render(
+            <MemoryRouter>
+                <ListingCreate listingType="REQUEST" />
+            </MemoryRouter>
+        );
+
+        await screen.findByText("Informática");
+        expect(
+            screen.getByText("Crear nueva demanda")
+        ).toBeInTheDocument();
+
+        fillListing();
+        fireEvent.click(
+            screen.getByRole("button", { name: "Publicar demanda" })
+        );
+
+        await waitFor(() => {
+            expect(global.fetch).toHaveBeenCalledTimes(2);
+        });
+
+        const request = JSON.parse(global.fetch.mock.calls[1][1].body);
+        expect(request.listingType).toBe("REQUEST");
+        expect(request.categoryId).toBe(1);
+        expect(request.estimatedHours).toBe(2);
+    });
+
+    test("shouldShowDefaultCreateError", async () => {
+        global.fetch
+            .mockResolvedValueOnce(categoriesResponse())
+            .mockResolvedValueOnce({
+                ok: false,
+                json: async () => ({})
+            });
+
+        render(
+            <MemoryRouter>
+                <ListingCreate listingType="OFFER" />
+            </MemoryRouter>
+        );
+
+        await screen.findByText("Informática");
+        fillListing();
+        fireEvent.click(
+            screen.getByRole("button", { name: "Publicar oferta" })
+        );
+
+        expect(
+            await screen.findByText("No se ha podido publicar el anuncio")
+        ).toBeInTheDocument();
+    });
+});
